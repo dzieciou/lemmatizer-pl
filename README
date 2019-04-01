@@ -1,0 +1,42 @@
+
+=================================== TRAINING ===================================
+
+training.py
+
+-> call with -h or --help for help
+-> more options available by modifying settings.py
+
++------------------------------------------------------------------------------+
+| The Keras library used by the script can be greedy on CPU cores.             |
+| Wrap the call e.g. in taskset to restrict the number of cores used.          |
++------------------------------------------------------------------------------+
+
+TRAINING DATA FORMAT:
+* Tab-separated file with following columns:
+    - wordform
+    - possible morphological analyses, pipe-separated (e.g. subst:sg:inst:n|ger:sg:inst:n:perf:aff)
+    - correct morphological analysis
+    - token label (may be left empty except for IGN for unknown words)
+    - (unused)
+    - (unused)
+
+Use PolEval/prepare_data.py to convert XCES to this format.
+Use dag2training.py to convert Morfeusz/Concraft DAG to this format.
+
+Define your tagset by modifying tagset.py.
+
+REQUIRED RESOURCES:
+* If Concraft2 input is to be included in input features:
+    - Concraft2 binary (set CONCRAFT_BIN in concraft_utils.py accordingly)
+    - tagset config file
+    - a directory where created Concraft data will be placed (DATA_DIR in concraft_utils.py)
+* If Word2Vec embeddings are to be included in input features:
+    - pretained models created by Aleksander Wawer, available from http://mozart.ipipan.waw.pl/~axw/models/orth/ (set WORD2VEC_MODELS_DIR is data.py to the directory where the models reside, do not change the model files’ names)
+
+=================================== TAGGING ====================================
+
+tagging.py
+-> call with -h or --help for help
+
+CURRENTLY SUPPORTED INPUT FORMATS:
+* XCES
