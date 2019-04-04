@@ -65,7 +65,7 @@ def outputTXT(data, chunk_tags, input_path, output_path):
 
 def outputDAG(data, chunk_tags, input_path, output_path, args):
     dict_path, dict_name = os.path.split(args.morfeusz_dict)
-    morfeusz = morfeusz2.Morfeusz(expand_tags=True, generate=False)
+    morfeusz = morfeusz2.Morfeusz(dict_name=dict_name, dict_path=dict_path, expand_tags=True, generate=False)
     sentences = readTXTsentences(input_path)
     with codecs.open(output_path, encoding='utf-8', mode='w') as dag:
         for sent_i, sentence in enumerate(sentences):
