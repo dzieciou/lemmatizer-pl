@@ -73,7 +73,7 @@ if __name__ == '__main__':
                 tok_go = go[tok_i]
                 assert (tok_an[0] == tok_go[0])
                 orth = tok_an[0]
-                tags = set(zip(*tok_an[1])[2])
+                tags = set(list(zip(*tok_an[1]))[2])
                 assert (len(tok_go[1]) == 1)
                 base, tag = tok_go[1][0][1:]
                 if 'ign' in tags:

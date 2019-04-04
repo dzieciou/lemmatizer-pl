@@ -18,14 +18,14 @@ from tagset import *
 from data import read_chunks, Indices, data2tensors
 
 available_char = 33
-TAG2CODE = dict()
-CODE2TAG = dict()
+TAG2CODE = {}
+CODE2TAG = {}
 for tag_grp in TAG_GROUPS:
-    first_char = unichr(available_char)
+    first_char = chr(available_char)
     available_char += 1
     for tag in tag_grp:
         if not tag.startswith('NO'):
-            code = first_char + unichr(available_char)
+            code = first_char + chr(available_char)
             TAG2CODE[tag] = code
             CODE2TAG[code] = tag
             available_char += 1
@@ -34,7 +34,7 @@ def tag2code(tag):
     return ''.join(TAG2CODE[t] for t in tag.split(':'))
 
 def code2tag(code):
-    return ':'.join(CODE2TAG[code[i:(i + 2)]] for i in xrange(0, len(code), 2))
+    return ':'.join(CODE2TAG[code[i:(i + 2)]] for i in range(0, len(code), 2))
 
 EXAMPLE_TYPES = ('STANDARD', 'TRIVIAL', 'INTERP', 'IGN', 'SEG')
 

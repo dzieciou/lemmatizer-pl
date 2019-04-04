@@ -15,7 +15,7 @@ from tagset import *
 from constants import *
 from concraft_utils import train_concraft_model, tag_data_with_concraft
 
-WORD2VEC_MODELS_DIR = '/home/kkrasnowska/SCWAD/models/axw/orth'
+WORD2VEC_MODELS_DIR = 'D:/Projects-intellij/crf/postagger/SCWAD-tagger/wordembeddings'
 
 def read_chunks(datafile, settings, MAX=None):
     chunks = []
@@ -94,7 +94,7 @@ class Indices(object):
             self.WORD2VEC = gensim.models.word2vec.Word2Vec.load(WORD2VEC_MODEL)
             print('building suffix index... ')
             self.SUFFIX_INDEX = defaultdict(set)
-            for w in self.WORD2VEC.vocab:
+            for w in self.WORD2VEC.wv.vocab:
                 for i in range(1, len(w)):
                     self.SUFFIX_INDEX[w[-i:]].add(w)
             print('done.')
@@ -116,7 +116,7 @@ class Indices(object):
     @staticmethod
     def load_indices(path, settings, task_id):
         indices = Indices(task_id)
-        with open(path, 'r') as f:
+        with open(path, 'rb') as f:
             dct = pickle.load(f)
         for attr, val in dct.items():
             setattr(indices, attr, val)
@@ -125,7 +125,7 @@ class Indices(object):
      
     def save(self, path):
         dct = { attr : val for attr, val in self.__dict__.items() if attr not in ('WORD2VEC', 'SUFFIX_INDEX') }
-        with open(path, 'w') as f:
+        with open(path, 'wb') as f:
             pickle.dump(dct, f)
 
 
@@ -169,7 +169,7 @@ def word2EmbeddingVec(word, indices, settings):
     for i in reversed(range(1, len(word))):
         suff = word[-i:]
         if suff in indices.SUFFIX_INDEX:
-            alternatives = sorted((Levenshtein.distance(unicode(w), word), w) for w in indices.SUFFIX_INDEX[suff])
+            alternatives = sorted((Levenshtein.distance(w, word), w) for w in indices.SUFFIX_INDEX[suff])
             min_dist = alternatives[0][0]
             alternatives = [indices.WORD2VEC[w] for d, w in alternatives if d == min_dist]
             return numpy.mean(alternatives, axis=0)

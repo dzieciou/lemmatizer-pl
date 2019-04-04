@@ -62,7 +62,7 @@ def build_model(indices, settings):
     masked_input = Masking(mask_value=0.,)(total_input)
     # bi-LSTM over the resulting representation
     biLSTM = Bidirectional(LSTM(settings.HIDDEN_DIM, return_sequences=True, dropout=0.5))(masked_input)
-    for i in xrange(settings.HIDDEN_LAYERS - 1):
+    for i in range(settings.HIDDEN_LAYERS - 1):
         biLSTM = Bidirectional(LSTM(settings.HIDDEN_DIM, return_sequences=True, dropout=0.5))(biLSTM)
     
     # separate outputs for tag positions

@@ -10,7 +10,7 @@ class Settings(object):
         self.HIDDEN_LAYERS = 2
         # LSTM is bidirectional, so this is actually doubled
         self.HIDDEN_DIM = 384
-        self.EPOCHS = 20
+        self.EPOCHS = 1
         self.BUCKET_SIZE = 2048
         self.TAGSET = NKJP
         # include only specified tag positions in input vectors
@@ -22,7 +22,7 @@ class Settings(object):
         self.WORD2VEC_DIM = 300
         self.FEED = SENT_FEED
         self.DATA_ID = 'PolEval'
-        self.TRAIN = ('PolEval/train.tab',)#('../folds/%d.tab' % i for i in xrange(7))
+        self.TRAIN = ('PolEval/train.tab',)#('../folds/%d.tab' % i for i in range(7))
         self.MAX_TRAIN_CHUNKS = 85660
         self.SEED = 42
     

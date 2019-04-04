@@ -32,14 +32,14 @@ def train_model(data, settings, task_id):
     indices = Indices.create_indices(data, settings, task_id)
     data_sorted = sorted(data, key=len)
     model = build_model(indices, settings)
-    batch_indices = range(len(data_sorted) // settings.BUCKET_SIZE + 1)
-    for EPOCH in xrange(settings.EPOCHS):
+    batch_indices = list(range(len(data_sorted) // settings.BUCKET_SIZE + 1))
+    for EPOCH in range(settings.EPOCHS):
         random.shuffle(batch_indices)
         for b, i in enumerate(batch_indices):
             print('EPOCH:', EPOCH, 'BUCKET:', b + 1)
             index = i * settings.BUCKET_SIZE
             X_trains, Y_trains = data2tensors(data_sorted[index:(index + settings.BUCKET_SIZE)], indices, settings, data_id=('%s_%d' % (task_id, i)))
-            for x_i in xrange(len(X_trains)):
+            for x_i in range(len(X_trains)):
                 print(X_trains[x_i][0][0])
             model.fit(X_trains, Y_trains, epochs=1, batch_size=128, verbose=2)
             del X_trains
@@ -52,10 +52,10 @@ def train_and_evaluate(args):
     train, test, settings, task_id = args
     numpy.random.seed(settings.SEED)
     random.seed(settings.SEED)
-    # in case there is no models directory
-    subprocess.call('mkdir models', shell=True)
+    # in case there is no wordembeddings directory
+    subprocess.call('mkdir wordembeddings', shell=True)
     # load or train&save the model
-    MODEL_DIR = os.path.join('models', HASH)
+    MODEL_DIR = os.path.join('wordembeddings', HASH)
     MODEL_PATH = os.path.join(MODEL_DIR, '%s_el-modelito.h5' % task_id)
     GRAPH_PATH = os.path.join(MODEL_DIR, '%s_el-modelito.png' % task_id)
     SETTINGS_PATH = os.path.join(MODEL_DIR, 'SETTINGS.pickle')
@@ -70,7 +70,7 @@ def train_and_evaluate(args):
         model.save(MODEL_PATH)
         plot_model(model, show_shapes=True, to_file=GRAPH_PATH)
         indices.save(INDICES_PATH)
-        with open(SETTINGS_PATH, 'w') as f:
+        with open(SETTINGS_PATH, 'wb') as f:
             pickle.dump(settings, f)
     # evaluate
     scores_train = evaluate_model(model, train, indices, settings, task_id + '_train_eval')
@@ -119,7 +119,7 @@ def main():
     print('\n%d training chunks used' % len(train_data))
     tasks = []
     if CROSS_VALID:
-        for fold in xrange(FOLDS):
+        for fold in range(FOLDS):
             lo = fold * FOLD_SIZE
             hi = lo + FOLD_SIZE
             print(hi, lo)

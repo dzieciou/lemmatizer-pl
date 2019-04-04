@@ -72,7 +72,7 @@ def outputTXT(data, chunk_tags, input_path, output_path):
 
 def outputDAG(data, chunk_tags, input_path, output_path, args):
     dict_path, dict_name = os.path.split(args.morfeusz_dict)
-    morfeusz = morfeusz2.Morfeusz(dict_name=dict_name, dict_path=dict_path, expand_tags=True, generate=False)
+    morfeusz = morfeusz2.Morfeusz(expand_tags=True, generate=False)
     sentences = readTXTsentences(input_path)
     with codecs.open(output_path, encoding='utf-8', mode='w') as dag:
         for sent_i, sentence in enumerate(sentences):
@@ -91,11 +91,11 @@ def outputDAG(data, chunk_tags, input_path, output_path, args):
                     if tag == disamb_tag:
                         disamb, match = 'disamb', True
                     if disamb or args.full_output:
-                        print('\t'.join(map(unicode, (i, j, orth, base, tag, '|'.join(posp), '|'.join(kwal), disamb))), file=dag)
+                        print('\t'.join(map(str, (i, j, orth, base, tag, '|'.join(posp), '|'.join(kwal), disamb))), file=dag)
                 if not match:
                     orth = interps[0][0]
                     base = orth
-                    print('\t'.join(map(unicode, (i, j, orth, base, disamb_tag, '', '', 'disamb'))), file=dag)
+                    print('\t'.join(map(str, (i, j, orth, base, disamb_tag, '', '', 'disamb'))), file=dag)
             print(file=dag)
     
 #===============================================================================
@@ -107,7 +107,7 @@ def XCES_analysed2data(path):
         chunks.append([])
         for tok in an:
             orth = tok[0]
-            tags = set(zip(*tok[1])[2])
+            tags = set(list(zip(*tok[1]))[2])
             tag = '_'
             if 'ign' in tags:
                 tags = set(['ign'])
@@ -193,7 +193,7 @@ def main():
     INDICES_PATH = MODEL_PATH.replace('el-modelito.h5', 'indices.pickle')
     print('reading model from file:', MODEL_PATH)
     model = load_model(MODEL_PATH)
-    with open(os.path.join(MODEL_DIR, 'SETTINGS.pickle')) as f:
+    with open(os.path.join(MODEL_DIR, 'SETTINGS.pickle'), 'rb') as f:
         settings = pickle.load(f)
     numpy.random.seed(settings.SEED)
     task_id = os.path.basename(MODEL_PATH).replace('_el-modelito.h5', '')
