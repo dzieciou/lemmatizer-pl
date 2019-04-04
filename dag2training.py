@@ -6,8 +6,8 @@ from __future__ import print_function
 import argparse
 import codecs
 import os
-
 from collections import defaultdict
+
 
 def append_to_tab(paragraph, outfile):
     segments = defaultdict(lambda: ['', set()])

@@ -1,27 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 from __future__ import division
+from __future__ import print_function
 
 import argparse
 import datetime
-import numpy
 import os
 import pickle
 import random
 import subprocess
-import time
-
 from multiprocessing import Pool
 
+import numpy
 from keras.models import load_model
 from keras.utils import plot_model
 
-from constants import *
 from data import read_chunks, Indices, data2tensors
-from network import build_model
 from evaluation import evaluate_model
+from network import build_model
 from settings import Settings
 
 SETTINGS = Settings()

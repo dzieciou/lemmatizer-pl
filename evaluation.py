@@ -1,21 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 from __future__ import division
+from __future__ import print_function
 
 import datetime
-import Levenshtein
-import numpy
-import os
-import pickle
-
-from keras.models import load_model
-
 from collections import Counter, defaultdict
 
+import Levenshtein
+import numpy
+
+from data import data2tensors
 from tagset import *
-from data import read_chunks, Indices, data2tensors
 
 available_char = 33
 TAG2CODE = {}

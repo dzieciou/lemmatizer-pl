@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from keras.layers import Input, Bidirectional, LSTM, Embedding, Dense, Concatenate, TimeDistributed, Masking, Multiply
+from keras.layers import Input, Bidirectional, LSTM, Embedding, Dense, \
+    Concatenate, TimeDistributed, Masking, Multiply
 from keras.models import Model
 
 from constants import *
 from tagset import *
-from settings import Settings
+
 
 def build_model(indices, settings):
     

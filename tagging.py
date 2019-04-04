@@ -1,31 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 from __future__ import division
+from __future__ import print_function
 
 import argparse
 import codecs
-import datetime
-import Levenshtein
-import numpy
 import os
 import pickle
-import subprocess
-
+from collections import defaultdict
 from xml.dom.minidom import parse
 
+import morfeusz2
+import numpy
 from keras.models import load_model
 
-import morfeusz2
-
-from collections import Counter, defaultdict
-
-from tagset import *
-from data import read_chunks, Indices, data2tensors
+from PolEval.prepare_data import extractSents
+from data import Indices
 from evaluation import evaluate_model
 
-from PolEval.prepare_data import extractSents
 
 #===============================================================================
 

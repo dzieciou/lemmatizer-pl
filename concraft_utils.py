@@ -5,10 +5,8 @@ from __future__ import print_function
 import codecs
 import os
 import subprocess
-
 from collections import defaultdict
 
-from tagset import *
 from constants import *
 
 CONCRAFT_BIN = 'concraft/concraft-dag2-pl'

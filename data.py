@@ -3,17 +3,17 @@
 from __future__ import print_function
 
 import codecs
-import Levenshtein
-import numpy
 import os
 import pickle
-
 from collections import defaultdict
-import gensim
 
-from tagset import *
-from constants import *
+import Levenshtein
+import gensim
+import numpy
+
 from concraft_utils import train_concraft_model, tag_data_with_concraft
+from constants import *
+from tagset import *
 
 WORD2VEC_MODELS_DIR = 'D:/Projects-intellij/crf/postagger/SCWAD-tagger/wordembeddings'
 

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from tagset import *
 from constants import *
+from tagset import *
+
 
 class Settings(object):
     
