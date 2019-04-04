@@ -49,10 +49,10 @@ def train_and_evaluate(args):
     train, test, settings, task_id = args
     numpy.random.seed(settings.SEED)
     random.seed(settings.SEED)
-    # in case there is no wordembeddings directory
-    subprocess.call('mkdir wordembeddings', shell=True)
+    # in case there is no models directory
+    subprocess.call('mkdir models', shell=True)
     # load or train&save the model
-    MODEL_DIR = os.path.join('wordembeddings', HASH)
+    MODEL_DIR = os.path.join('models', HASH)
     MODEL_PATH = os.path.join(MODEL_DIR, '%s_el-modelito.h5' % task_id)
     GRAPH_PATH = os.path.join(MODEL_DIR, '%s_el-modelito.png' % task_id)
     SETTINGS_PATH = os.path.join(MODEL_DIR, 'SETTINGS.pickle')

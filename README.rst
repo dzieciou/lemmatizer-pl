@@ -72,7 +72,7 @@ Required resources
     - a directory where created Concraft data will be placed (``DATA_DIR`` in ``concraft_utils.py``)
 * If Word2Vec embeddings are to be included in input features:
     - `pretrained wordembeddings`_ created by Aleksander Wawer, available from  (set ``WORD2VEC_MODELS_DIR``
-       in ``data.py`` to the directory where the wordembeddings reside, do not change the model files’ names)
+       in ``data.py`` to the directory where the models reside, do not change the model files’ names)
 
 .. _pretrained wordembeddings: http://mozart.ipipan.waw.pl/~axw/wordembeddings/orth/
 
