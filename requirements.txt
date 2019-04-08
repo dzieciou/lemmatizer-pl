@@ -3,5 +3,4 @@ python-Levenshtein
 keras
 numpy
 gensim
-morfeusz2
 numpy
