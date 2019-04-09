@@ -11,7 +11,7 @@ class Settings(object):
         self.HIDDEN_LAYERS = 2
         # LSTM is bidirectional, so this is actually doubled
         self.HIDDEN_DIM = 384
-        self.EPOCHS = 1
+        self.EPOCHS = 20
         self.BUCKET_SIZE = 2048
         self.TAGSET = NKJP
         # include only specified tag positions in input vectors
