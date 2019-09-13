@@ -54,7 +54,7 @@ contest and has been described in:
 
 .. _Toygger: http://mozart.ipipan.waw.pl/~kkrasnowska/PolEval/src/SCWAD-tagger/
 .. _PolEval 2017: http://2017.poleval.pl/
-.. _Morphosyntactic disambiguation for Polish with bi-LSTM neural networks: http://ltc.amu.edu.pl/book/papers/PolEval1-2.pdf
+.. _Morphosyntactic disambiguation for Polish with bi-LSTM neural networks: PolEval1-2.pdf
 
 Tagsets and dictionaries
 ------------------------
