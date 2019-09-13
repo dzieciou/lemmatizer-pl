@@ -47,10 +47,10 @@ Morphological analysis looks in one of provided dictionaries.
 Morphological disambiguation use refactored version of `Toygger`_ tagger that won `PolEval 2017`_
 contest and has been described in:
 
-  Krasnowska-Kieraś Katarzyna (2017). `Morphosyntactic disambiguation for Polish with bi-LSTM neural
-networks`_. In Zygmunt Vetulani and Patrick Paroubek (eds.) *Proceedings of the 8th Language &
- Technology Conference: Human Language Technologies as a Challenge for Computer Science and
- Linguistics*, pp. 367–371, Poznań, Poland. Fundacja Uniwersytetu im. Adama Mickiewicza w Poznaniu.
+* Krasnowska-Kieraś Katarzyna (2017). `Morphosyntactic disambiguation for Polish with bi-LSTM neural networks`_.
+  In Zygmunt Vetulani and Patrick Paroubek (eds.) *Proceedings of the 8th Language &
+  Technology Conference: Human Language Technologies as a Challenge for Computer Science and
+  Linguistics*, pp. 367–371, Poznań, Poland. Fundacja Uniwersytetu im. Adama Mickiewicza w Poznaniu.
 
 .. _Toygger: http://mozart.ipipan.waw.pl/~kkrasnowska/PolEval/src/SCWAD-tagger/
 .. _PolEval 2017: http://2017.poleval.pl/
