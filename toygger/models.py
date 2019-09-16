@@ -9,6 +9,7 @@ from tensorflow.python.keras.layers import (
 from tensorflow.python.keras.models import (
     Model
 )
+from tensorflow.python.keras.utils import plot_model
 
 HIDDEN_LAYERS = 2
 HIDDEN_LAYER_DIMENSION = 384
@@ -42,13 +43,17 @@ def create_model(categories, categories_index, word2vec):
     for _ in range(HIDDEN_LAYERS - 1):
         biLSTM = Bidirectional(LSTM(
             HIDDEN_LAYER_DIMENSION,
-            return_sequences=True, dropout=0.5)
+            return_sequences=True,
+            dropout=0.5)
         )(biLSTM)
 
     predicted_tag_categories = [
-        Dense(len(category), activation='softmax', name=f'category_{category_id}')(biLSTM)
-        for category_id, category
-        in enumerate(categories)
+        Dense(
+            len(category.values),
+            activation='softmax',
+            name=f'{category.name}')(biLSTM)
+        for category
+        in categories
     ]
 
     model = Model(
@@ -58,7 +63,11 @@ def create_model(categories, categories_index, word2vec):
 
     model.compile(
         optimizer='rmsprop',
-        loss='categorical_crossentropy'
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
     )
+
+    # TODO Should we remove it? Or enable with some debug flag?
+    plot_model(model, to_file='model.png')
 
     return model

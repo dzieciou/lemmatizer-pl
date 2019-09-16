@@ -56,6 +56,10 @@ contest and has been described in:
 .. _PolEval 2017: http://2017.poleval.pl/
 .. _Morphosyntactic disambiguation for Polish with bi-LSTM neural networks: PolEval1-2.pdf
 
+Here's network model used for NKJP tagset:
+
+.. image:: nkjp-model.png
+
 Tagsets and dictionaries
 ------------------------
 
