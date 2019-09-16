@@ -12,8 +12,7 @@ and updated by comparing with actual tags in Poliform dictionary.
 '''
 
 from toygger import morphology as morph
-
-optional = morph.Tagset._optional
+from toygger.morphology import Tagset, Category, optional
 
 lexemes = {
     'verb': (
@@ -36,20 +35,29 @@ lexemes = {
     'frag': ('frag',),
 }
 
-number = ('sg', 'pl', 'NO_NUMBER')
-case = ('nom', 'gen', 'dat', 'acc', 'inst', 'loc', 'voc', 'NO_CASE')
-gender = ('m1', 'm2', 'm3', 'f', 'n', 'NO_GENDER')
-subgender = ('col', 'ncol', 'pt', 'NO_SUBGENDER')
-person = ('pri', 'sec', 'ter', 'NO_PERSON')
-degree = ('pos', 'com', 'sup', 'NO_DEGREE')
-aspect = ('imperf', 'perf', 'NO_ASPECT')
-negation = ('aff', 'neg', 'NO_NEGATION')
-accentability = ('akc', 'nakc', 'NO_ACCENTABILITY')
-post_prepositionality = ('npraep', 'praep', 'NO_POST_PREPOSITIONALITY')
-accommodability = ('congr', 'rec', 'NO_ACCOMODABILITY')
-agglutination = ('agl', 'nagl', 'NO_AGGLUTINATION')
-vocalicity = ('nwok', 'wok', 'NO_VOCALICITY')
-fullstoppedness = ('pun', 'npun', 'NO_FULLSTOPPEDNESS')
+number = Category('number', ('sg', 'pl', 'NO_NUMBER'))
+case = Category('case', (
+    'nom', 'gen', 'dat', 'acc', 'inst', 'loc', 'voc', 'NO_CASE'))
+gender = Category('gender',
+                  ('m1', 'm2', 'm3', 'f', 'n', 'NO_GENDER'))
+subgender = Category('subgender',
+                     ('col', 'ncol', 'pt', 'NO_SUBGENDER'))
+person = Category('person', ('pri', 'sec', 'ter', 'NO_PERSON'))
+degree = Category('degree', ('pos', 'com', 'sup', 'NO_DEGREE'))
+aspect = Category('aspect', ('imperf', 'perf', 'NO_ASPECT'))
+negation = Category('negation', ('aff', 'neg', 'NO_NEGATION'))
+accentability = Category('accentability',
+                         ('akc', 'nakc', 'NO_ACCENTABILITY'))
+post_prepositionality = Category('post_prepositionality', (
+    'npraep', 'praep', 'NO_POST_PREPOSITIONALITY'))
+accommodability = Category('accommodability',
+                           ('congr', 'rec', 'NO_ACCOMODABILITY'))
+agglutination = Category('agglutination',
+                         ('agl', 'nagl', 'NO_AGGLUTINATION'))
+vocalicity = Category('vocalicity',
+                      ('nwok', 'wok', 'NO_VOCALICITY'))
+fullstoppedness = Category('fullstoppedness',
+                           ('pun', 'npun', 'NO_FULLSTOPPEDNESS'))
 
 combinations = {
     'brev': (fullstoppedness,),
@@ -91,7 +99,7 @@ combinations = {
     'frag': (),
 }
 
-pos = tuple(combinations.keys())
+pos = Category('pos', tuple(combinations.keys()))
 
 categories = (
     pos, number, case, gender, subgender, person, degree, aspect, negation,
@@ -99,7 +107,7 @@ categories = (
     vocalicity, fullstoppedness
 )
 
-tagset = morph.Tagset(categories, combinations, lexemes)
+tagset = Tagset(categories, combinations, lexemes)
 
 
 def load_dict(fpath, limit=None, expand_tags=True):

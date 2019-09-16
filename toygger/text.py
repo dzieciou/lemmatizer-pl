@@ -3,7 +3,7 @@ from json import JSONEncoder
 
 
 def to_json(obj):
-    return json.dumps(obj, ensure_ascii=False)
+    return json.dumps(obj, ensure_ascii=False, indent=None)
 
 
 class Token(JSONEncoder):

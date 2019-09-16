@@ -1,15 +1,14 @@
 from typing import List
 
+from toygger.morphology import Category
 
-def _flatten(list_of_lists: List[List]) -> List:
-    all_values = []
-    for list in list_of_lists:
-        all_values.extend(list)
-    return all_values
 
-def build_categories_index(categories: List[List]):
+
+def build_categories_index(categories: List[Category]):
     # Flatten list of lists (or tuple of tuples) to a single list
-    all_values = _flatten(categories)
+    all_values = []
+    for category in categories:
+        all_values.extend(category.values)
     return build_index(all_values)
 
 def build_index(values: List):

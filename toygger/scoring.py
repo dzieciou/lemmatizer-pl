@@ -1,4 +1,4 @@
-from sklearn.metrics import make_scorer, accuracy_score
+from sklearn.metrics import accuracy_score
 
 
 def flatten(chunks):

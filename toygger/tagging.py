@@ -43,8 +43,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
         self._pipeline = self._create_pipeline(categories, self.word2vec)
 
         outputs_ids = list([f'category_{id}' for id in range(len(categories))])
-        self._y_transformer = DisambCTagEncoder(categories, outputs_ids)
-
+        self._y_transformer = DisambCTagEncoder(categories)
         self._y_corrector = CTagCorrector(categories, self.tagset)
 
     def _create_pipeline(self, categories, word2vec):
@@ -63,6 +62,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
         return pipeline
 
     def _make_buckets(self, chunks_X, chunks_y):
+
         chunks_X = sorted(chunks_X, key=lambda chunk: len(chunk.tokens))
         chunks_y = sorted(chunks_y, key=lambda chunk: len(chunk.tokens))
         buckets = []
@@ -107,6 +107,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
         for chunk_X, pred_chunk in zip(chunks_X, pred_chunks):
             for token_X, pred_token in zip(chunk_X.tokens, pred_chunk.tokens):
+                pred_token.orth = token_X.orth
                 pred_token.lemmas = token_X.lemmas
                 pred_token.ctags = token_X.ctags
 
@@ -189,7 +190,7 @@ class CTagCorrector:
         alphabet = (c for c in string.printable)
         for category in self.categories:
             category_code = next(alphabet)
-            for value in category:
+            for value in category.values:
                 if not value.startswith('NO'):
                     value_code = category_code + next(alphabet)
                     value2code[value] = value_code
@@ -243,7 +244,25 @@ class PosTagger:
         self._analyzer = analyzer
         self._disambiguator = disambiguator
 
+    def to_chunk(self, tokens):
+        tokens = [Token(orth) for orth in tokens]
+        return Chunk(tokens)
+
+
     def tag(self, chunks):
+        if isinstance(chunks, Chunk):
+            chunks = [chunks]
+        elif isinstance(chunks, list):
+            if isinstance(chunks[0], str):
+                # List of strings
+                chunks = [self.to_chunk(chunks)]
+            elif isinstance(chunks[0], Chunk):
+                pass
+            else:
+                raise ValueError('Should provide a chunk or a list of chunks or strings')
+        else:
+            raise ValueError('Should provide a chunk or a list of chunks or strings')
+
         self._analyzer.analyze(chunks)
         predicted_ctags = self._disambiguator.predict(chunks)
         for chunk_id, chunk in enumerate(chunks):

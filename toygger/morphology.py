@@ -1,16 +1,41 @@
 from itertools import product
+from collections import namedtuple
+from typing import List
 
+
+
+
+Category = namedtuple('Category', ['name', 'values'])
+
+def optional(category):
+    '''
+    Syntactic sugar to mark certain category optional for a given part of
+    speech.
+    '''
+    values = (None,) + category.values
+    return Category(name=category.name, values=values)
 
 class Tagset:
 
     def __init__(self, categories, combinations, lexemes = None):
         self.categories = categories
+        self.value2category = self._build_value2category_index(categories)
         self.combinations = combinations
         self.valid_ctags = self._generate_values(combinations)
         self.all_pos = tuple(combinations.keys())
         self.lexemes = lexemes
         if not lexemes is None:
             self.lexem_by_pos = self._build_lexem_index(lexemes)
+
+    def _build_value2category_index(self,categories: List[Category]):
+        index = {}
+        for category in categories:
+            for value in category.values:
+                if not value.startswith('NO'):
+                    # FIXME this is adding category as a tuple of values
+                    #       we need a name of a category here
+                    index[value] = category.name
+        return index
 
     def _without_noval(self, category):
         return category[:-1]
@@ -19,7 +44,7 @@ class Tagset:
         valid_ctags = set()
         for pos, combination in combinations.items():
             values_combinations = product(
-                *[self._without_noval(category) for category in combination])
+                *[self._without_noval(category.values) for category in combination])
             for seq in values_combinations:
                 ctag = ':'.join(filter(None, (pos,) + seq))
                 valid_ctags.add(ctag)
@@ -32,12 +57,12 @@ class Tagset:
                 index[pos] = lexeme
         return index
 
-    def _optional(cat_values):
-        '''
-        Syntactic sugar to mark certain category optional for a given part of
-        speech.
-        '''
-        return (None,) + cat_values
+    def parse_ctag(self, ctag):
+        values = ctag.split(':')
+        return {self.value2category[value] : value for value in values}
+
+
+
 
 
 class Entry:

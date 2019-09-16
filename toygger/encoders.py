@@ -123,13 +123,13 @@ class CTagsEncoder(ChunkEncoder):
             values.update(ctag.split(':'))
 
         for category in self.categories:
-            active_values = values.intersection(category)
+            active_values = values.intersection(category.values)
             if active_values:
                 self._multi_hot_encoding(vector,
                                          active_values,
                                          self.categories_index)
             else:
-                novalue = category[-1]
+                novalue = category.values[-1]
                 vector[self.categories_index[novalue]] = 1
 
         return vector
@@ -158,8 +158,8 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
     def fit(self, chunks, *args):
         return self
 
-    def __init__(self, outputs_ids):
-        self.outputs_ids = outputs_ids
+    def __init__(self, outputs_names):
+        self.outputs_names = outputs_names
 
     def transform(self, chunks):
         '''
@@ -169,16 +169,16 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
         '''
         outputs = defaultdict(list)
         for chunk in chunks:
-            for output_id in self.outputs_ids:
+            for output_id in self.outputs_names:
                 outputs[output_id].append([])
             for token in chunk.tokens:
                 ys = self._transform_token(token)
-                for output_id in self.outputs_ids:
+                for output_id in self.outputs_names:
                     output = outputs[output_id]
                     y = ys[output_id]
                     output[-1].append(y)
 
-        for output_id in self.outputs_ids:
+        for output_id in self.outputs_names:
             output = outputs[output_id]
             output = pad_sequences(output,
                                        padding='post',
@@ -220,8 +220,9 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
 
 class DisambCTagEncoder(MultiOutputsChunkEncoder):
 
-    def __init__(self, categories, outputs_ids):
-        super().__init__(outputs_ids)
+    def __init__(self, categories):
+        outputs_names = [category.name for category in categories]
+        super().__init__(outputs_names)
         self.categories = categories
         self.encoder = CTagsEncoder(categories)
 
@@ -234,24 +235,26 @@ class DisambCTagEncoder(MultiOutputsChunkEncoder):
         return len(self.categories[output_id])
 
     def _default_value(self, output_id):
-        category_id = self.outputs_ids.index(output_id)
+        category_id = self.outputs_names.index(output_id)
         category = self.categories[category_id]
-        return np.zeros(len(category))
+        return np.zeros(len(category.values))
 
     def split_by_output(self, tag_vector):
         offset = 0
         outputs = {}
-        for outputs_ids, category in zip(self.outputs_ids, self.categories):
-            l = len(category)
+        for outputs_ids, category in zip(self.outputs_names, self.categories):
+            l = len(category.values)
             outputs[outputs_ids] = tag_vector[offset:(offset + l)]
             offset += l
         return outputs
 
+
     def _inverse_transform_token(self, ys):
         values = []
-        for category_id, category in enumerate(self.categories):
-            y = ys[category_id]
-            value = category[y]
+        for category in self.categories:
+            output_id = self.outputs_names.index(category.name)
+            y = ys[output_id]
+            value = category.values[y]
             if not value.startswith('NO'):
                 values.append(value)
         return ':'.join(values)

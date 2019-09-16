@@ -14,9 +14,7 @@ def create_postagger(dict, word2vec, model):
     return PosTagger.create(dict, word2vec, model)
 
 
-def to_chunk(tokens):
-    tokens = [Token(orth) for orth in tokens]
-    return Chunk(tokens)
+
 
 
 if __name__ == '__main__':
@@ -27,7 +25,5 @@ if __name__ == '__main__':
     )
 
     tokenized = 'Ala ma kota'.split(' ')
-    chunks = [to_chunk(tokenized)]
-    tagged = tagger.tag(chunks)
-
+    tagged = tagger.tag(tokenized)
     print(tagged)

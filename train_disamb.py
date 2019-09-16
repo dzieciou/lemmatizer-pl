@@ -43,7 +43,8 @@ def check(chunks_X, chunks_y, tagset):
 
 
 def train(chunks_X, chunks_y, tagset, word2vec, save_model):
-    disambiguator = MorphDisambiguator(tagset, word2vec)
+    # TODO it should be possible to set epochs parameters during fitting, not constructing
+    disambiguator = MorphDisambiguator(tagset, word2vec, epochs=20)
 
     with timing('Training disambiguator'):
         disambiguator.fit(chunks_X, chunks_y)
@@ -57,10 +58,10 @@ def load_train(analyzed, gold, tagset, word2vec, save_model):
     log.setLevel(logging.DEBUG)
 
     with timing('Loading train data'):
-        chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=None)
+        chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=4095)
 
     with timing('Loading word vectors'):
-        word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=None)
+        word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=100)
 
     check(chunks_X, chunks_y, tagset)
 
@@ -73,5 +74,5 @@ if __name__ == '__main__':
         gold='c:/data/train/nkjp/poleval2017/train-gold.xml',
         tagset=nkjp.tagset,
         word2vec='c:/data/nkjp+wiki-forms-all-300-skipg-ns.txt',
-        save_model='data/disambiguation.h5'
+        save_model='data/disambiguation2.h5'
     )
