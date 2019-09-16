@@ -10,6 +10,9 @@ class KerasInputFormatter(_BaseComposition, TransformerMixin):
     # Copies from https://github.com/keras-team/keras/issues/9001#issuecomment-365522923
 
     def __init__(self, transformers):
+        """
+        :param transformers: a dictionary of named transformers
+        """
         self.transformers = transformers
 
     def fit(self, X, y=None):
@@ -46,8 +49,15 @@ class KerasClassifierMultipleOutputs(BaseWrapper):
         self.model.load_weights(fpath)
 
     def fit(self, x, y, **fit_params):
-        # FIXME what if it is already created
-        self._create_model()
+        """
+        Yes, successive calls to fit will incrementally train the model.
+        :param x:
+        :param y:
+        :param fit_params:
+        :return:
+        """
+        if not hasattr(self, 'model') or self.model is None:
+            self._create_model()
         history = self.model.fit(x, y, **fit_params)
         return history
 
@@ -55,6 +65,8 @@ class KerasClassifierMultipleOutputs(BaseWrapper):
         #kwargs = self.filter_sk_params(Sequential.predict_classes, kwargs)
         y_prob = self.model.predict(x, **kwargs)
         classes = [y.argmax(axis=-1) for y in y_prob]
+        # TODO Return dictionary of outputs instead, using the approach below
+        #      https://github.com/keras-team/keras/issues/2422#issuecomment-383662647
         return classes
         #return self.classes_[classes]
 
