@@ -26,26 +26,28 @@ def tokenize(text):
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
-with timing('Loading dictionary entries'):
-    dict = load_dict('../data/polimorf-20190818.tab',
-                     limit=5000)
+def test_usage():
 
-with timing('Loading word vectors'):
-    word_vectors = KeyedVectors.load_word2vec_format(
-        '../data/nkjp+wiki-forms-all-300-skipg-ns.txt', limit=5000)
+    with timing('Loading dictionary entries'):
+        dict = load_dict('data/dict/polimorf-20190818.tab',
+                         limit=5000)
 
-with timing('Initializing POS tagger'):
-    posTagger = PosTagger.create(dict, word_vectors)
-    posTagger.load_model('disambiguation.h5')
+    with timing('Loading word vectors'):
+        word_vectors = KeyedVectors.load_word2vec_format(
+            'data/nkjp+wiki-forms-all-300-skipg-ns.txt', limit=5000)
 
-text = '5 kilogramów pomidorów trafiło do kuchnii. Zostały ugotowane na miękko.'
-chunks = tokenize(text)
-assert chunks[0].tokens[1].orth == 'kilogramów'
+    with timing('Initializing POS tagger'):
+        posTagger = PosTagger.create(dict, word_vectors)
+        posTagger.load_model('data/disambiguation.h5')
 
-print(chunks)
+    text = '5 kilogramów pomidorów trafiło do kuchnii. Zostały ugotowane na miękko.'
+    chunks = tokenize(text)
+    assert chunks[0].tokens[1].orth == 'kilogramów'
 
-posTagger.tag(chunks)
-assert chunks[0].tokens[1].disamb_lemma == 'kilogram'
-assert chunks[0].tokens[1].disamb_tag.startswith('noun')
+    print(chunks)
 
-print(chunks)
+    posTagger.tag(chunks)
+    assert chunks[0].tokens[1].disamb_lemma == 'kilogram'
+    assert chunks[0].tokens[1].disamb_tag.startswith('noun')
+
+    print(chunks)

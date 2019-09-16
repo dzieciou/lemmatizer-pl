@@ -6,15 +6,20 @@ from xces import load_chunks_set
 
 from toygger import nkjp
 
-analyzed='data/train/nkjp/poleval2017/train-analyzed.xml'
-gold='data/train/nkjp/poleval2017/train-gold.xml'
+def test_usage():
 
-with timing('Loading train data'):
-    chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=1)
+    analyzed='c:/data/train/nkjp/poleval2017/train-analyzed.xml'
+    gold='c:/data/train/nkjp/poleval2017/train-gold.xml'
 
-with timing('Loading word vectors'):
-    word2vec = KeyedVectors.load_word2vec_format('data/nkjp+wiki-forms-all-300-skipg-ns.txt', limit=5000)
+    with timing('Loading test data'):
+        chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=20)
 
-m = MorphDisambiguator(nkjp.tagset, word2vec)
-m.load_model('data/disambiguation.h5')
-print(m.predict(chunks_X[0:1]))
+    with timing('Loading word vectors'):
+        word2vec = KeyedVectors.load_word2vec_format('c:/data/nkjp+wiki-forms-all-300-skipg-ns.txt', limit=10)
+
+    m = MorphDisambiguator(nkjp.tagset, word2vec, correct_preds=False)
+    m.load_model('data/disambiguation.h5')
+
+
+    print(m.predict(chunks_X[10:11]))
+    print(chunks_y[10:11])

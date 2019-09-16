@@ -1,28 +1,35 @@
-from toygger.morphology import Tagset
+from toygger.morphology import Tagset, optional, Category
+
+
+def get_sample_tagset():
+    number = Category('number', ('sg', 'pl', 'NOVAL'))
+    gender = Category('gender', ('m1', 'm2', 'm3', 'f', 'NOVAL2'))
+    another_category = Category('another_category', ('x', 'y', 'NOVAL3'))
+    yet_another_category = Category('yet_another_category',
+                                    ('k', 'l', 'NOVAL4'))
+
+    combinations = {
+        'adj': [number,
+                optional(another_category),
+                optional(yet_another_category)],
+        'subst': [number, gender]
+    }
+
+    pos = Category('pos', combinations.keys())
+    categories = (pos, number, gender, another_category, yet_another_category)
+
+    return Tagset(categories, combinations)
+
+
+def test_parse_ctag():
+    assert get_sample_tagset().parse_ctag('adj:x') == {
+        'pos': 'adj',
+        'another_category': 'x'
+    }
 
 
 def test_Tagset():
-    class TestTagset(Tagset):
-
-        def __init__(self):
-            number = ('sg', 'pl', 'NOVAL')
-            gender = ('m1', 'm2', 'm3', 'f', 'NOVAL')
-            another_category = ('x', 'y', 'NOVAL')
-            yet_another_category = ('k', 'l', 'NOVAL')
-
-            optional = Tagset._optional
-
-            combinations = {
-                'adj': [number,
-                        optional(another_category),
-                        optional(yet_another_category)],
-                'subst': [number, gender]
-            }
-            super().__init__(lexemes={}, combinations=combinations)
-
-    x = TestTagset()
-
-    assert x.valid_ctags == set({
+    assert get_sample_tagset().valid_ctags == set({
         'adj:pl',
         'adj:pl:k',
         'adj:pl:l',
