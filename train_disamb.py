@@ -44,10 +44,10 @@ def check(chunks_X, chunks_y, tagset):
 
 def train(chunks_X, chunks_y, tagset, word2vec, save_model):
     # TODO it should be possible to set epochs parameters during fitting, not constructing
-    disambiguator = MorphDisambiguator(tagset, word2vec, epochs=20)
+    disambiguator = MorphDisambiguator(tagset, word2vec)
 
     with timing('Training disambiguator'):
-        disambiguator.fit(chunks_X, chunks_y)
+        disambiguator.fit(chunks_X, chunks_y, epochs=6)
 
     with timing('Saving disambiguator model'):
         disambiguator.save_model(save_model)
@@ -58,10 +58,10 @@ def load_train(analyzed, gold, tagset, word2vec, save_model):
     log.setLevel(logging.DEBUG)
 
     with timing('Loading train data'):
-        chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=4095)
+        chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=4096)
 
     with timing('Loading word vectors'):
-        word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=100)
+        word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=10)
 
     check(chunks_X, chunks_y, tagset)
 

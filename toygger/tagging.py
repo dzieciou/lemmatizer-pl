@@ -1,4 +1,5 @@
 import logging
+import math
 import random
 import string
 from operator import itemgetter
@@ -41,8 +42,6 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
     def _setup(self):
         categories = self.tagset.categories
         self._pipeline = self._create_pipeline(categories, self.word2vec)
-
-        outputs_ids = list([f'category_{id}' for id in range(len(categories))])
         self._y_transformer = DisambCTagEncoder(categories)
         self._y_corrector = CTagCorrector(categories, self.tagset)
 
@@ -66,7 +65,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
         chunks_X = sorted(chunks_X, key=lambda chunk: len(chunk.tokens))
         chunks_y = sorted(chunks_y, key=lambda chunk: len(chunk.tokens))
         buckets = []
-        buckets_count = len(chunks_X) // self.bucket_size + 1
+        buckets_count = math.ceil(len(chunks_X) / self.bucket_size)
         for bucket_id in list(range(buckets_count)):
             start = bucket_id * self.bucket_size
             end = start + self.bucket_size
@@ -77,13 +76,20 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
     def score(self, y, y_pred):
         return self.word_accuracy_score(y, y_pred)
 
+    def set_params(self, **params):
+        attrs = list(params.keys())
+        for attr in attrs:
+            setattr(self, attr, params.pop(attr))
+
+        self._pipeline.set_params(**params)
+
     def fit(self, chunks_X, chunks_y, **fit_params):
         if len(chunks_X) != len(chunks_y):
             raise ValueError()
 
         self._check_setup()
 
-        self._pipeline.set_params(**fit_params)
+        self.set_params(**fit_params)
 
         buckets = self._make_buckets(chunks_X, chunks_y)
         for epoch in range(self.epochs):
@@ -92,7 +98,9 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
             for bucket_id, (chunks_X, chunks_y) in enumerate(buckets):
                 log.debug(f'Bucket {bucket_id + 1}/{len(buckets)}...')
                 y = self._y_transformer.fit_transform(chunks_y)
-                self._pipeline.fit(chunks_X, y)
+                self._pipeline.fit(chunks_X, y,
+                                   clf__epochs=1,
+                                   clf__batch_size=128)
 
     def transform(self, chunks_X):
         '''
@@ -120,7 +128,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
     def load_model(self, fpath):
         self._check_setup()
-        self._get_model().load_model_weights (fpath)
+        self._get_model().load_model_weights(fpath)
 
     def _get_model(self):
         return self._pipeline.named_steps['clf']
@@ -248,7 +256,6 @@ class PosTagger:
         tokens = [Token(orth) for orth in tokens]
         return Chunk(tokens)
 
-
     def tag(self, chunks):
         if isinstance(chunks, Chunk):
             chunks = [chunks]
@@ -259,9 +266,11 @@ class PosTagger:
             elif isinstance(chunks[0], Chunk):
                 pass
             else:
-                raise ValueError('Should provide a chunk or a list of chunks or strings')
+                raise ValueError(
+                    'Should provide a chunk or a list of chunks or strings')
         else:
-            raise ValueError('Should provide a chunk or a list of chunks or strings')
+            raise ValueError(
+                'Should provide a chunk or a list of chunks or strings')
 
         self._analyzer.analyze(chunks)
         predicted_ctags = self._disambiguator.predict(chunks)
