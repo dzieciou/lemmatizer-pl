@@ -1,7 +1,7 @@
 Lemmatizer for Polish
 =====================
 
-Python library to provide lemmas and morphological categories for a tokenized text in Polish.
+Python library to provide lemmas and morphological categories for tokenized text in Polish.
 
 How to use
 ----------
@@ -76,6 +76,16 @@ model on samples annotated with the new tagset.
 Evaluation
 ----------
 
+Time to load warm up (loading dictionary and wordnet)
+Time to predict for xxxx tokens: ???s (???s/token)
+Time to analyze and predict for xxxx tokens: ???s (???s/token)
+
+Disambiguation accuracy on token level:
+  Average: ?? %
+  For tokens with more than one ctag candidate: ?? %
+  For POS category only
+
+
 
 How to train
 ------------
@@ -111,3 +121,16 @@ Data
 * Word vectors based on NKJP and Wiki (forms): http://dsmodels.nlp.ipipan.waw.pl/dsmodels/nkjp+wiki-lemmas-all-300-skipg-ns.txt.gz
 * Word vectors based on NKJP and Wiki (lemmas): http://dsmodels.nlp.ipipan.waw.pl/dsmodels/nkjp+wiki-forms-all-300-skipg-ns.txt.gz
 * FastText word vectors for Polish: https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.pl.300.vec.gz
+
+License
+-------
+
+Lemmatizer code - GPL license, inherited from Toyyger
+Dictionary -
+Pretrained disambiguation model -
+* FastText: Creative Commons Attribution-Share-Alike License 3.0.,
+            https://creativecommons.org/licenses/by-sa/3.0/
+            E. Grave*, P. Bojanowski*, P. Gupta, A. Joulin, T. Mikolov, Learning Word Vectors for 157 Languages
+            https://arxiv.org/abs/1802.06893
+Word vectors:
+
