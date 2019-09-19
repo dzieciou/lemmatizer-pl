@@ -1,3 +1,6 @@
+# Work in progress. Not ready to use yet.
+
+
 Lemmatizer for Polish
 =====================
 
