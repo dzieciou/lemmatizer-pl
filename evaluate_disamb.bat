@@ -1,1 +1,0 @@
-PYTHONHASHSEED=0 python3 evaluate_disamb.py
