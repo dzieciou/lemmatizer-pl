@@ -77,6 +77,7 @@ combinations = {
     'prep': (case, optional(vocalicity)),
     'qub': (optional(vocalicity),),
     'siebie': (case,),
+    'siebie': (case,),
     'subst': (number, case, gender),
     'winien': (number, gender, aspect),
     'xxx': (),

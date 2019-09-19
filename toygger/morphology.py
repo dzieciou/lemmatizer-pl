@@ -59,22 +59,27 @@ class Tagset:
         if ctag not in self.valid_ctags:
             raise ValueError(f'Invalid ctag: {ctag}')
 
+    def get_category(self, value):
+        if '.' in value:
+            value = value.split('.')[0]
+        return self.value2category[value]
+
     def parse_ctag(self, ctag):
         values = ctag.split(':')
-        return {self.value2category[value]: value for value in values}
+        return {self.get_category(value): value for value in values}
 
     def build_ctag(self, parsed):
-        # TODO perhaps we should validate keys and values against tagset
         ctag = ':'.join([value for key, value in parsed.items()])
         self.check_ctag(ctag)
         return ctag
 
-class Entry:
+
+class DictEntry:
     """
     Dictionary entry.
     """
 
-    def __init__(self, orth, lemma, ctag, rest):
+    def __init__(self, orth, lemma, ctag, rest=None):
         """
         :param orth:
         :param lemma:
@@ -91,6 +96,16 @@ class Entry:
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        if not isinstance(other, DictEntry):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+
+        return self.orth == other.orth \
+               and self.lemma == other.lemma \
+               and self.ctag == other.ctag \
+               and self.rest == other.rest
 
 
 class Dictionary:
@@ -173,9 +188,9 @@ def load_dict(fpath, tagset, limit=None, expand_tags=True, sep='\t',
             # Expand ctags with . notation into multiple ctags
             for seq in product(*[v.split('.') for v in ctag.split(':')]):
                 ctag = ':'.join(seq)
-                entries.append(Entry(orth, lemma, ctag, rest))
+                entries.append(DictEntry(orth, lemma, ctag, rest))
         else:
-            entries.append(Entry(orth, lemma, ctag, rest))
+            entries.append(DictEntry(orth, lemma, ctag, rest))
         return entries
 
     lookup = {}
@@ -201,6 +216,7 @@ def load_dict(fpath, tagset, limit=None, expand_tags=True, sep='\t',
 def load_morfeusz1_dict(fpath, tagset, limit=None):
     def skip_first_line(f):
         f.readline()
+
     return load_dict(fpath, tagset, limit, expand_tags=True, sep=' ',
                      handle_preamble=skip_first_line)
 
@@ -212,5 +228,6 @@ def load_morfeusz2_dict(fpath, tagset, limit=None):
             line = f.readline()
             if line.startswith('#'):
                 comments += 1
+
     return load_dict(fpath, tagset, limit, expand_tags=True, sep='\t',
                      handle_preamble=skip_comments)
