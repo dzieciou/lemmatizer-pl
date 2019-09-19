@@ -4,6 +4,7 @@ from tensorflow.python.keras.wrappers.scikit_learn import BaseWrapper
 from sklearn.base import TransformerMixin
 from sklearn.utils.metaestimators import _BaseComposition
 
+from tensorflow.python.keras.callbacks import TensorBoard
 
 class KerasInputFormatter(_BaseComposition, TransformerMixin):
     # Solution to passing multiple inputs from Scikit to Keras
@@ -58,7 +59,17 @@ class KerasClassifierMultipleOutputs(BaseWrapper):
         """
         if not hasattr(self, 'model') or self.model is None:
             self._create_model()
-        history = self.model.fit(x, y, **fit_params)
+        callbacks = [
+            # FIXME This results in a bug
+            #       tensorflow.python.eager.core._FallbackException: This
+            #       function does not handle the case of the path where all
+            #       inputs are not already EagerTensors.
+            #TensorBoard(
+            #    log_dir='log_dir',
+            #    histogram_freq=1
+            #)
+        ]
+        history = self.model.fit(x, y, callbacks=callbacks, **fit_params)
         return history
 
     def predict(self, x, **kwargs):

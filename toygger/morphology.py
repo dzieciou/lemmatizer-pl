@@ -1,11 +1,9 @@
-from itertools import product
 from collections import namedtuple
+from itertools import product
 from typing import List
 
-
-
-
 Category = namedtuple('Category', ['name', 'values'])
+
 
 def optional(category):
     '''
@@ -15,9 +13,10 @@ def optional(category):
     values = (None,) + category.values
     return Category(name=category.name, values=values)
 
+
 class Tagset:
 
-    def __init__(self, categories, combinations, lexemes = None):
+    def __init__(self, categories, combinations, lexemes=None):
         self.categories = categories
         self.value2category = self._build_value2category_index(categories)
         self.combinations = combinations
@@ -27,13 +26,11 @@ class Tagset:
         if not lexemes is None:
             self.lexem_by_pos = self._build_lexem_index(lexemes)
 
-    def _build_value2category_index(self,categories: List[Category]):
+    def _build_value2category_index(self, categories: List[Category]):
         index = {}
         for category in categories:
             for value in category.values:
                 if not value.startswith('NO'):
-                    # FIXME this is adding category as a tuple of values
-                    #       we need a name of a category here
                     index[value] = category.name
         return index
 
@@ -44,7 +41,8 @@ class Tagset:
         valid_ctags = set()
         for pos, combination in combinations.items():
             values_combinations = product(
-                *[self._without_noval(category.values) for category in combination])
+                *[self._without_noval(category.values) for category in
+                  combination])
             for seq in values_combinations:
                 ctag = ':'.join(filter(None, (pos,) + seq))
                 valid_ctags.add(ctag)
@@ -59,10 +57,7 @@ class Tagset:
 
     def parse_ctag(self, ctag):
         values = ctag.split(':')
-        return {self.value2category[value] : value for value in values}
-
-
-
+        return {self.value2category[value]: value for value in values}
 
 
 class Entry:
@@ -81,20 +76,6 @@ class Entry:
         self.lemma = lemma
         self.ctag = ctag
         self.rest = rest
-
-    @classmethod
-    def parse(cls, line, expand_tags=True):
-        orth, lemma, ctag, *rest = line.strip().split('\t')
-        entries = []
-        if expand_tags:
-            # Expand ctags with . notation into multiple ctags
-            for seq in product(*[v.split('.') for v in ctag.split(':')]):
-                ctag = ':'.join(seq)
-                entries.append(Entry(orth, lemma, ctag, rest))
-        else:
-            entries.append(Entry(orth, lemma, ctag, rest))
-
-        return entries
 
     def __str__(self):
         return f'{{orth={self.orth}, lemma={self.lemma}, ctag={self.ctag}, rest={self.rest}}}'
@@ -130,8 +111,8 @@ class Dictionary:
         tagset_values.update(self.tagset.all_pos)
         for category in self.tagset.categories:
             # without no_val
-            category = category[:-1]
-            tagset_values.update(category)
+            values = category.values[:-1]
+            tagset_values.update(values)
 
         values_missing = sorted(dict_values.difference(tagset_values))
         values_unused = sorted(tagset_values.difference(dict_values))
@@ -157,24 +138,41 @@ class Dictionary:
         return self.lookup[token]
 
 
-def load_dict(fpath, tagset, limit=None, expand_tags=True):
+def load_dict(fpath, tagset, limit=None, expand_tags=True, sep='\t',
+    handle_preamble=None):
     """
     Load dictionary from text file.
     :param fpath: str
                   The file path to the saved dictionary text file.
+    :param tagset: Tagset
+                  Tagset of the dictionary.
     :param limit: int, optional
                   Sets a maximum number of dictionary entries to read from
                   the file. The default, None, means read all.
+    :param expand_tags: bool
+                  Sets whether to expand tags with . dot notation to multiple
+                  entries.
+    :param sep: str
+                  Separator of fields in a single line.
     :return: Dictionary
     """
+
+    def parse(line):
+        orth, lemma, ctag, *rest = line.strip().split(sep)
+        entries = []
+        if expand_tags:
+            # Expand ctags with . notation into multiple ctags
+            for seq in product(*[v.split('.') for v in ctag.split(':')]):
+                ctag = ':'.join(seq)
+                entries.append(Entry(orth, lemma, ctag, rest))
+        else:
+            entries.append(Entry(orth, lemma, ctag, rest))
+        return entries
+
     lookup = {}
     with open(fpath, 'r', encoding='utf-8') as f:
-        # Skip comments
-        comments = 0
-        while comments < 3:
-            line = f.readline()
-            if line.startswith('#'):
-                comments += 1
+        if not handle_preamble is None:
+            handle_preamble(f)
 
         if limit:
             lines = [next(f) for _ in range(limit)]
@@ -182,10 +180,28 @@ def load_dict(fpath, tagset, limit=None, expand_tags=True):
             lines = f
 
         for line in lines:
-            entries = Entry.parse(line, expand_tags)
+            entries = parse(line)
             orth = entries[0].orth
             if orth not in lookup:
                 lookup[orth] = []
             lookup[orth].extend(entries)
 
     return Dictionary(lookup, tagset)
+
+
+def load_morfeusz1_dict(fpath, tagset, limit=None):
+    def skip_first_line(f):
+        f.readline()
+    return load_dict(fpath, tagset, limit, expand_tags=True, sep=' ',
+                     handle_preamble=skip_first_line)
+
+
+def load_morfeusz2_dict(fpath, tagset, limit=None):
+    def skip_comments(f):
+        comments = 0
+        while comments < 3:
+            line = f.readline()
+            if line.startswith('#'):
+                comments += 1
+    return load_dict(fpath, tagset, limit, expand_tags=True, sep='\t',
+                     handle_preamble=skip_comments)
