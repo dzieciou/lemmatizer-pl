@@ -55,10 +55,19 @@ class Tagset:
                 index[pos] = lexeme
         return index
 
+    def check_ctag(self, ctag):
+        if ctag not in self.valid_ctags:
+            raise ValueError(f'Invalid ctag: {ctag}')
+
     def parse_ctag(self, ctag):
         values = ctag.split(':')
         return {self.value2category[value]: value for value in values}
 
+    def build_ctag(self, parsed):
+        # TODO perhaps we should validate keys and values against tagset
+        ctag = ':'.join([value for key, value in parsed.items()])
+        self.check_ctag(ctag)
+        return ctag
 
 class Entry:
     """

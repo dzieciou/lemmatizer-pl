@@ -110,5 +110,5 @@ categories = (
 tagset = Tagset(categories, combinations, lexemes)
 
 
-def load_dict(fpath, limit=None, expand_tags=True):
-    return morph.load_morfeusz2_dict(fpath, tagset, limit, expand_tags)
+def load_dict(fpath, limit=None):
+    return morph.load_morfeusz2_dict(fpath, tagset, limit)
