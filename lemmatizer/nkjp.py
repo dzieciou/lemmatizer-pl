@@ -14,9 +14,28 @@ from lemmatizer import morphology as morph
 
 from lemmatizer.morphology import Tagset, Category, optional
 
-# TODO Add lexems to cast POS to more generic categories, like in Polimorf tagset
-
-
+lexemes = {
+    'verb': (
+        'fin', 'bedzie', 'aglt', 'praet', 'impt', 'imps', 'inf', 'pcon', 'pant',
+        'ger', 'pact', 'ppas'),
+    'winien': ('winien',),
+    'pred': ('pred',),
+    'noun': ('subst', 'depr'),
+    'adj': ('adj', 'adja', 'adjp', 'adjc'),
+    'adv': ('adv',),
+    'num': ('num', 'numcol'),
+    'ppron12': ('ppron12',),
+    'ppron3': ('ppron3',),
+    'siebie': ('siebie',),
+    'prep': ('prep',),
+    'conj': ('conj',),
+    'comp': ('comp',),
+    'interj': ('interj',),
+    'brev': ('brev',),
+    'burk': ('burk',),
+    'qub': ('qub',),
+    'xxx': ('xxx',),
+}
 
 number = Category('number', ('sg', 'pl', 'NONUM'))
 case = Category('case', ('nom', 'gen', 'dat', 'acc', 'inst', 'loc', 'voc',
@@ -33,7 +52,6 @@ agglutination = Category('agglutination', ('agl', 'nagl', 'NOAGL'))
 vocalicity = Category('vocalicity', ('wok', 'nwok', 'NOVOC'))
 negation = Category('negation', ('aff', 'neg', 'NOAFF'))
 fullstoppedness = Category('fullstoppedness', ('pun', 'npun', 'NOPUN'))
-
 
 combinations = {
     'adj': (number, case, gender, degree),
@@ -83,7 +101,7 @@ categories = (
     fullstoppedness
 )
 
-tagset = Tagset(categories, combinations)
+tagset = Tagset(categories, combinations, lexemes)
 
 
 def load_dict(fpath, limit=None):
