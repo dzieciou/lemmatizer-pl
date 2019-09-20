@@ -1,82 +1,99 @@
+"""
+Poliform tagset has been defined based on the following resources:
+
+- NKJP tagset: http://nkjp.pl/poliqarp/help/ense2.html
+
+- Narodowy Korpus Języka Polskiego, praca zbiorowa pod redakcją Adama
+  Przepiórkowskiego, Mirosława Bańko, Rafała L. Górskiego, Barbary
+  Lewandowskiej-Tomaszczyk, Wydawnictwo Naukowe PWN, Warszawa 2012
+  http://nkjp.pl/settings/papers/NKJP_ksiazka.pdf
+
+"""
+
 from toygger import morphology as morph
 
 from toygger.morphology import Tagset, Category, optional
 
-POS_V = Category('pos', ('adj', 'adja', 'adjc', 'adjp', 'adv', 'aglt', 'bedzie',
-                         'brev', 'burk', 'comp', 'conj', 'depr', 'fin', 'ger',
-                         'ign', 'imps', 'impt', 'inf', 'interj', 'interp',
-                         'num', 'numcol', 'pact', 'pacta', 'pant', 'pcon',
-                         'ppas', 'ppron12', 'ppron3', 'praet', 'pred', 'prep',
-                         'qub', 'siebie', 'subst', 'winien', 'xxx'))
-NUM_V = Category('num', ('sg', 'pl', 'NONUM'))
-CASE_V = Category('case', ('nom', 'gen', 'dat', 'acc', 'inst', 'loc', 'voc',
-                           'NOCASE'))
-GEND_V = Category('gend', ('m1', 'm2', 'm3', 'f', 'n', 'NOGEND'))
-REC_V = Category('rec', ('rec', 'congr', 'NOREC'))
-PERS_V = Category('pers', ('pri', 'sec', 'ter', 'NOPERS'))
-ACC_V = Category('acc', ('akc', 'nakc', 'NOACC'))
-PRP_V = Category('prp', ('praep', 'npraep', 'NOPRP'))
-DEG_V = Category('deg', ('pos', 'com', 'sup', 'NODEG'))
-ASP_V = Category('asp', ('perf', 'imperf', 'NOASP'))
-AGL_V = Category('agl', ('agl', 'nagl', 'NOAGL'))
-VOC_V = Category('voc', ('wok', 'nwok', 'NOVOC'))
-AFF_V = Category('aff', ('aff', 'neg', 'NOAFF'))
-PUN_V = Category('pun', ('pun', 'npun', 'NOPUN'))
+# TODO Add lexems to cast POS to more generic categories, like in Polimorf tagset
+
+pos = Category('pos', ('adj', 'adja', 'adjc', 'adjp', 'adv', 'aglt', 'bedzie',
+                       'brev', 'burk', 'comp', 'conj', 'depr', 'fin', 'ger',
+                       'ign', 'imps', 'impt', 'inf', 'interj', 'interp',
+                       'num', 'numcol', 'pact', 'pacta', 'pant', 'pcon',
+                       'ppas', 'ppron12', 'ppron3', 'praet', 'pred', 'prep',
+                       'qub', 'siebie', 'subst', 'winien', 'xxx'))
+number = Category('number', ('sg', 'pl', 'NONUM'))
+case = Category('case', ('nom', 'gen', 'dat', 'acc', 'inst', 'loc', 'voc',
+                         'NOCASE'))
+gender = Category('gender', ('m1', 'm2', 'm3', 'f', 'n', 'NOGEND'))
+accommodability = Category('accommodability', ('rec', 'congr', 'NOREC'))
+person = Category('person', ('pri', 'sec', 'ter', 'NOPERS'))
+accentability = Category('accentability', ('akc', 'nakc', 'NOACC'))
+post_prepositionality = Category('post_prepositionality', ('praep', 'npraep',
+                                                           'NOPRP'))
+degree = Category('degree', ('pos', 'com', 'sup', 'NODEG'))
+aspect = Category('aspect', ('perf', 'imperf', 'NOASP'))
+agglutination = Category('agglutination', ('agl', 'nagl', 'NOAGL'))
+vocalicity = Category('vocalicity', ('wok', 'nwok', 'NOVOC'))
+negation = Category('negation', ('aff', 'neg', 'NOAFF'))
+fullstoppedness = Category('fullstoppedness', ('pun', 'npun', 'NOPUN'))
 
 categories = (
-    POS_V,
-    NUM_V,
-    CASE_V,
-    GEND_V,
-    REC_V,
-    PERS_V,
-    ACC_V,
-    PRP_V,
-    DEG_V,
-    ASP_V,
-    AGL_V,
-    VOC_V,
-    AFF_V,
-    PUN_V,
+    pos,
+    number,
+    case,
+    gender,
+    accommodability,
+    person,
+    accentability,
+    post_prepositionality,
+    degree,
+    aspect,
+    agglutination,
+    vocalicity,
+    negation,
+    fullstoppedness,
 )
 
 combinations = {
-    'adj': (NUM_V, CASE_V, GEND_V, DEG_V),
+    'adj': (number, case, gender, degree),
     'adja': (),
     'adjc': (),
     'adjp': (),
-    'adv': (optional(DEG_V),),
-    'aglt': (NUM_V, PERS_V, ASP_V, VOC_V),
-    'bedzie': (NUM_V, PERS_V, ASP_V),
-    'brev': (PUN_V,),
+    'adv': (optional(degree),),
+    'aglt': (number, person, aspect, vocalicity),
+    'bedzie': (number, person, aspect),
+    'brev': (fullstoppedness,),
     'burk': (),
     'comp': (),
     'conj': (),
-    'depr': (NUM_V, CASE_V, GEND_V),
-    'fin': (NUM_V, PERS_V, ASP_V),
-    'ger': (NUM_V, CASE_V, GEND_V, ASP_V, AFF_V),
+    'depr': (number, case, gender),
+    'fin': (number, person, aspect),
+    'ger': (number, case, gender, aspect, negation),
     'ign': (),
-    'imps': (ASP_V,),
-    'impt': (NUM_V, PERS_V, ASP_V),
-    'inf': (ASP_V,),
+    'imps': (aspect,),
+    'impt': (number, person, aspect),
+    'inf': (aspect,),
     'interj': (),
     'interp': (),
-    'num': (NUM_V, CASE_V, GEND_V, REC_V),
-    'numcol': (NUM_V, CASE_V, GEND_V, REC_V),
-    'pact': (NUM_V, CASE_V, GEND_V, ASP_V, AFF_V),
+    'num': (number, case, gender, accommodability),
+    'numcol': (number, case, gender, accommodability),
+    'pact': (number, case, gender, aspect, negation),
     'pacta': (),
-    'pant': (ASP_V,),
-    'pcon': (ASP_V,),
-    'ppas': (NUM_V, CASE_V, GEND_V, ASP_V, AFF_V),
-    'ppron12': (NUM_V, CASE_V, GEND_V, PERS_V, optional(ACC_V)),
-    'ppron3': (NUM_V, CASE_V, GEND_V, PERS_V, optional(ACC_V), optional(PRP_V)),
-    'praet': (NUM_V, GEND_V, ASP_V, optional(AGL_V)),
+    'pant': (aspect,),
+    'pcon': (aspect,),
+    'ppas': (number, case, gender, aspect, negation),
+    'ppron12': (number, case, gender, person, optional(accentability)),
+    'ppron3': (number, case, gender, person, optional(accentability),
+               optional(post_prepositionality)),
+    'praet': (number, gender, aspect, optional(agglutination)),
     'pred': (),
-    'prep': (CASE_V, optional(VOC_V)),
-    'qub': (optional(VOC_V),),
-    'siebie': (CASE_V,),
-    'subst': (NUM_V, CASE_V, GEND_V),
-    'winien': (NUM_V, GEND_V, ASP_V),
+    'prep': (case, optional(vocalicity)),
+    'qub': (optional(vocalicity),),
+    'siebie': (case,),
+    'siebie': (case,),
+    'subst': (number, case, gender),
+    'winien': (number, gender, aspect),
     'xxx': (),
 }
 

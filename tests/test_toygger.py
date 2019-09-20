@@ -1,5 +1,5 @@
 from toygger import Chunk, Token
-from toygger.morphology import Dictionary, Entry
+from toygger.morphology import Dictionary, DictEntry
 from toygger.tagging import MorphAnalyzer
 
 
@@ -11,7 +11,7 @@ def test_MorphAnalyzer():
         ])
     ]
 
-    dict = Dictionary({known_word: [Entry(known_word, 'pomidor', 'xyz', '')]})
+    dict = Dictionary({known_word: [DictEntry(known_word, 'pomidor', 'xyz', '')]})
     analyzer = MorphAnalyzer(dict)
 
     analyzer.analyze(chunks)

@@ -104,7 +104,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
     def transform(self, chunks_X):
         '''
-        Disambiguated ctags for given chunks of tokens.
+        Disambiguate ctags for given chunks of tokens.
         :param chunks_X:
         :return: list of list of predicted ctags for given chunks of tokens.
         '''
@@ -273,10 +273,15 @@ class PosTagger:
                 'Should provide a chunk or a list of chunks or strings')
 
         self._analyzer.analyze(chunks)
-        predicted_ctags = self._disambiguator.predict(chunks)
-        for chunk_id, chunk in enumerate(chunks):
-            for token_id, token in enumerate(chunk.tokens):
-                token.disamb_ctag = predicted_ctags[chunk_id][token_id]
+        pred_chunks = self._disambiguator.predict(chunks)
+        for chunk, pred_chunk in zip(chunks, pred_chunks):
+            for token, pred_token in zip(chunk.tokens, pred_chunk.tokens):
+                disamb_ctag = pred_token.disamb_ctag
+                index = token.ctags.index(disamb_ctag)
+                disamb_lemma = token.lemmas[index]
+                pred_token.disamb_lemma = disamb_lemma
+
+        return pred_chunks
 
     def load_model(self, fpath):
         self._disambiguator.load_model(fpath)
