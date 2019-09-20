@@ -10,9 +10,9 @@ Poliform tagset has been defined based on the following resources:
 
 """
 
-from toygger import morphology as morph
+from lemmatizer import morphology as morph
 
-from toygger.morphology import Tagset, Category, optional
+from lemmatizer.morphology import Tagset, Category, optional
 
 # TODO Add lexems to cast POS to more generic categories, like in Polimorf tagset
 

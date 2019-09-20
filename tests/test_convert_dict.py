@@ -1,6 +1,6 @@
-from convert_dict import collapse, collapse_all
-from toygger import nkjp
-from toygger.morphology import DictEntry
+from convert_dict import collapse
+from lemmatizer import nkjp
+from lemmatizer.morphology import DictEntry
 
 
 def parse(line):

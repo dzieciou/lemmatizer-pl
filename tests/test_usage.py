@@ -4,9 +4,9 @@ import re
 from gensim.models import KeyedVectors
 
 from eval import timing
-from toygger import PosTagger
-from toygger.polimorf import load_dict
-from toygger.tagging import Chunk, Token
+from lemmatizer import Lemmatizer
+from lemmatizer.polimorf import load_dict
+from lemmatizer.text import Chunk, Token
 
 
 def tokenize(text):
@@ -37,7 +37,7 @@ def test_usage():
             'data/nkjp+wiki-forms-all-300-skipg-ns.txt', limit=5000)
 
     with timing('Initializing POS tagger'):
-        posTagger = PosTagger.create(dict, word_vectors)
+        posTagger = Lemmatizer.create(dict, word_vectors)
         posTagger.load_model('data/disambiguation.h5')
 
     text = '5 kilogramów pomidorów trafiło do kuchnii. Zostały ugotowane na miękko.'

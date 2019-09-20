@@ -1,6 +1,7 @@
-from toygger import Chunk, Token
-from toygger.morphology import Dictionary, DictEntry
-from toygger.tagging import MorphAnalyzer
+from lemmatizer.analyze import MorphAnalyzer
+
+from lemmatizer import Chunk, Token
+from lemmatizer.morphology import Dictionary, DictEntry
 
 
 def test_MorphAnalyzer():

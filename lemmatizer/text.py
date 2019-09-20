@@ -1,12 +1,11 @@
 import json
-from json import JSONEncoder
 
 
 def to_json(obj):
     return json.dumps(obj, ensure_ascii=False, indent=None)
 
 
-class Token(JSONEncoder):
+class Token:
     def __init__(self, orth, lemmas=None, ctags=None, disamb_lemma=None,
         disamb_ctag=None):
         self.orth = orth

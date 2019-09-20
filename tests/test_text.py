@@ -1,4 +1,4 @@
-from toygger.text import Token, Chunk
+from lemmatizer.text import Token, Chunk
 
 
 def test_serializing():

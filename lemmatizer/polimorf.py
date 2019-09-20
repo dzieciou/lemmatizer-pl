@@ -11,8 +11,8 @@ and updated by comparing with actual tags in Poliform dictionary.
 
 """
 
-from toygger import morphology as morph
-from toygger.morphology import Tagset, Category, optional
+from lemmatizer import morphology as morph
+from lemmatizer.morphology import Tagset, Category, optional
 
 lexemes = {
     'verb': (

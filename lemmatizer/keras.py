@@ -1,10 +1,9 @@
 import types
 
-from tensorflow.python.keras.wrappers.scikit_learn import BaseWrapper
 from sklearn.base import TransformerMixin
 from sklearn.utils.metaestimators import _BaseComposition
+from tensorflow.python.keras.wrappers.scikit_learn import BaseWrapper
 
-from tensorflow.python.keras.callbacks import TensorBoard
 
 class KerasInputFormatter(_BaseComposition, TransformerMixin):
     # Solution to passing multiple inputs from Scikit to Keras

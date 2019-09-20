@@ -1,7 +1,6 @@
 from typing import List
 
-from toygger.morphology import Category
-
+from lemmatizer.morphology import Category
 
 
 def build_categories_index(categories: List[Category]):

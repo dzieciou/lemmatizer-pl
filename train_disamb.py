@@ -5,13 +5,13 @@ Train MorphDisambiguator and save its model to file.
 import logging
 
 from gensim.models import KeyedVectors
+from tensorflow.python.util import deprecation
 
 from eval import timing
-from toygger import nkjp
-from toygger.tagging import MorphDisambiguator
+from lemmatizer import nkjp
+from lemmatizer.disamb import MorphDisambiguator
 from xces import load_chunks_set
 
-from tensorflow.python.util import deprecation
 deprecation._PRINT_DEPRECATION_WARNINGS = False
 
 

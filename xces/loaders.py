@@ -5,7 +5,7 @@ from xml.sax.handler import feature_external_ges
 import xpath
 from smart_open import open
 
-from toygger import Token, Chunk
+from lemmatizer import Token, Chunk
 
 
 def load_chunks(fpath, limit=None):

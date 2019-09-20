@@ -1,4 +1,4 @@
-from toygger.morphology import Tagset, optional, Category
+from lemmatizer.morphology import Tagset, optional, Category
 
 
 def get_sample_tagset():

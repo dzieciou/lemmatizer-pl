@@ -1,11 +1,11 @@
 import numpy as np
 from gensim.models import KeyedVectors
 
-from toygger import Token, Chunk
-from toygger.encoders import WordEmbedEncoder, CTagsEncoder, DisambCTagEncoder
-from toygger.keras import KerasInputFormatter
-from toygger.morphology import Category
-from toygger.polimorf import tagset
+from lemmatizer import Token, Chunk
+from lemmatizer.disamb import WordEmbedEncoder, CTagsEncoder, DisambCTagEncoder
+from lemmatizer.keras import KerasInputFormatter
+from lemmatizer.morphology import Category
+from lemmatizer.polimorf import tagset
 
 
 def test_WordEmbedEncoder():

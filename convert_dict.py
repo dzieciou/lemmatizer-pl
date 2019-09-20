@@ -25,8 +25,8 @@ following resources:
 from collections import defaultdict
 from itertools import groupby
 
-from toygger import polimorf, nkjp
-from toygger.morphology import DictEntry
+from lemmatizer import polimorf, nkjp
+from lemmatizer.morphology import DictEntry
 
 
 class IncompatibleCTag(ValueError):

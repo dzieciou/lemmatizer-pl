@@ -1,10 +1,10 @@
 from gensim.models import KeyedVectors
 
 from eval import timing
-from toygger.tagging import MorphDisambiguator
+from lemmatizer import nkjp
+from lemmatizer.disamb import MorphDisambiguator
 from xces import load_chunks_set
 
-from toygger import nkjp
 
 def test_usage():
 

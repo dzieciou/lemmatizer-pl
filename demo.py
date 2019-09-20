@@ -4,14 +4,14 @@ Demonstrates how to use PosTagger with a pretrained model for disambiguation.
 
 from gensim.models import KeyedVectors
 
-from toygger import PosTagger
-from toygger.nkjp import load_dict
+from lemmatizer.lemmatize import Lemmatizer
+from lemmatizer.nkjp import load_dict
 
 
 def create_postagger(dict, word2vec, model):
     dict = load_dict(dict)
     word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=100)
-    return PosTagger.create(dict, word2vec, model)
+    return Lemmatizer.create(dict, word2vec, model)
 
 
 if __name__ == '__main__':
