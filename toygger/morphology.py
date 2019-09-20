@@ -159,8 +159,11 @@ class Dictionary:
         :param token:
         :return:
         '''
-        return self.lookup[token]
 
+        if token in self.lookup:
+            return self.lookup[token]
+
+        return self.lookup.get(token.lower())
 
 def load_dict(fpath, tagset, limit=None, expand_tags=True, sep='\t',
     handle_preamble=None):
