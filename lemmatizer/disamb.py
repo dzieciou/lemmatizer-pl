@@ -319,7 +319,7 @@ class WordEmbedEncoder(ChunkEncoder):
 class CTagsEncoder(ChunkEncoder):
 
     def __init__(self, categories):
-        self.categories = categories;
+        self.categories = categories
         self.categories_index = build_categories_index(categories)
 
     def fit(self, chunks, *args):
