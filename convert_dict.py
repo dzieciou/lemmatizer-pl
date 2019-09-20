@@ -1,12 +1,31 @@
+"""
+Converts dictionary from one tagset to another automatically. This is a very
+rough conversion and possibly lossy without additional human annotator input.
+
+An alternative might be using/consulting more advanced tools written by
+linguists, e.g. MACA (Morphological Analysis Converter and Aggregator)
+http://nlp.pwr.wroc.pl/redmine/projects/libpltagger/wiki.
+
+Polimorf to NKJP tagset conversion rules have been defined by consulting the
+following resources:
+
+- Marcin Wolinski, Automatyczna analiza składnikowa języka polskiego,
+  Wydawnictwa Uniwersytetu Warszawskiego 2019
+  https://doi.org/10.31338/uw.9788323536147
+- Morfeusz online demo: http://morfeusz.sgjp.pl/demo/
+- Narodowy Korpus Języka Polskiego, praca zbiorowa pod redakcją Adama
+  Przepiórkowskiego, Mirosława Bańko, Rafała L. Górskiego, Barbary
+  Lewandowskiej-Tomaszczyk, Wydawnictwo Naukowe PWN, Warszawa 2012
+  http://nkjp.pl/settings/papers/NKJP_ksiazka.pdf
+- NKJP tagset: http://nkjp.pl/poliqarp/help/ense2.html
+- Poliqarp search engine for NKJP data: http://nkjp.pl/poliqarp/
+- MACA conversion rules, http://nlp.pwr.wroc.pl/redmine/projects/libpltagger/wiki
+"""
+
 from collections import defaultdict
 from itertools import groupby
 
 from toygger import polimorf, nkjp
-# TODO Mentiond this very rough conversion to get things done
-# TODO Mention about MACA
-# TODO Document convertion rules
-# TODO Add tag collapsing
-# FIXME Note we do not add original preamble again
 from toygger.morphology import DictEntry
 
 
@@ -17,27 +36,53 @@ class IncompatibleCTag(ValueError):
 def polimorf2nkjp(ctag):
     d = polimorf.tagset.parse_ctag(ctag)
 
-    # Some words do not have corresponding annotations in NKJP
+    # Some words do not have corresponding annotations in NKJP tagset.
     if d['pos'] in ['numcomp']:
-        # Dla liczebników wprowadzono także fleksem reprezentujący formę występującą w złożeniach numcomp. W większości wypadków nie pojawia się ona w wynikach analizy, bo słowa takie jak czterodrzwiowemu są traktowane jako
-        # formy leksemu czterodrzwiowy. Forma numcomp może pojawić się samodzielnie przy analizie pierwszego członu konstrukcji takich jak cztero- albo pięciodrzwiowy.
-        # https://www.wuw.pl/data/include/cms/Automatyczna_analiza_skladnikowa_Wolinski_Marcin_2019.pdf
+        # numcomp correponds to "cztero" in phrases like "cztero- albo
+        # pięciodrzwiowy". Words like "czterodrzwiowy" are not split by Morfeusz
+        # and hence are not treated as numcomp. There is no correponding
+        # lexem in NKJP tagset. The closest would be num, however, it requires
+        # additional categories like number, case, gender, etc.
         raise IncompatibleCTag()
 
-    # Some POS are named differently in NKJP
+    # Some POS are named differently in NKJP tagset.
     d['pos'] = {
+        # frag stands for part of a phraseme and describes words that are not
+        # present seperately in other contexts, e.g. "wznak" exists only in
+        # "na wznak". In NKJP tagset they are called burkinostki (burk).
         'frag': 'burk',
+        # Following MACA conversion rule...
         'part': 'qub',
+        # cond describes conditional forms like "widziałbym". In NKJP tagset
+        # they are split into three tokens, e.g.
+        #   widział [widzieć:praet:sg:m1:imperf]
+        #   by      [by:qub]
+        #   m       [być:aglt:sg:pri:imperf:nwok]
+        # Our morphological analyzer does not split words into smaller token
+        # (i.e. so-called agglutination is not considered).
         'cond': 'praet'
     }.get(d['pos'], d['pos'])
 
-    # Some categories are not present at all in NKJP
+    # Some categories are not present at all in NKJP tagset.
+    # Subgender (pl. przyrodzaj) in some tagsets is described with custom gender
+    # values (n1, p1, p2). In NKJP tagset this information is not present in
+    # any form.
     d.pop('subgender', None)
 
-    # Some categories are not present for selected POS in NKJP
+    # Some categories are not present for selected POS in NKJP tagset.
     if d['pos'] == 'adjp':
+        # In NKJP tagset post-prepositional adjectives do not have information
+        # about case
         d.pop('case', None)
     if d['pos'] == 'praet':
+        # In Polimorf past forms of verbs (pl. przeslik) like "widziałem" are
+        # treated as a whole and have information about person, e.g.: "pri" in
+        # widziałem	widzieć:praet:sg:m1.m2.m3:pri:imperf
+        # In NKJP agglutination is considered, and information about person
+        # is included in agglutinate, e.g.:
+        #   widział [widzieć:praet:sg:m1:imperf]
+        #   by      [by:qub]
+        #   m       [być:aglt:sg:pri:imperf:nwok]
         d.pop('person', None)
     if d['pos'] == 'winien':
         d.pop('person', None)
@@ -47,8 +92,9 @@ def polimorf2nkjp(ctag):
 
 
 def collapse_ctags(tagset, orth, lemma, entries):
-    for category in ['number', 'gender', 'case' ]:
-        entries = collapse_ctags_by_category(tagset, orth, lemma, entries, category)
+    for category in ['number', 'gender', 'case']:
+        entries = collapse_ctags_by_category(tagset, orth, lemma, entries,
+                                             category)
     return entries
 
 
@@ -92,11 +138,13 @@ def collapse(tagset, orth, entries):
         merged.extend(collapse_ctags(tagset, orth, lemma, group))
     return merged
 
+
 def collapse_all(tagset, lookup):
     merged = []
     for orth, entries in lookup.items():
         merged.extend(collapse(tagset, orth, entries))
     return merged
+
 
 def convert_entries(lookup, convert):
     converted = defaultdict(list)
@@ -114,19 +162,20 @@ def convert_entries(lookup, convert):
 
     return converted
 
+
 def write_dict(entries, fpath):
+    # FIXME Note we do not add original preamble again
     with open(fpath, 'wb') as f:
         for e in entries:
             line = f'{e.orth}\t{e.lemma}\t{e.ctag}\n'
             f.write(line.encode('utf-8'))
+
 
 def convert_dict(in_fpath, out_fpath, convert):
     dict = polimorf.load_dict(in_fpath)
     converted = convert_entries(dict.lookup, convert)
     merged = collapse_all(nkjp.tagset, converted)
     write_dict(merged, out_fpath)
-
-
 
 
 if __name__ == '__main__':

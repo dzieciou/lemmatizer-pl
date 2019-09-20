@@ -1,6 +1,20 @@
+"""
+Poliform tagset has been defined based on the following resources:
+
+- NKJP tagset: http://nkjp.pl/poliqarp/help/ense2.html
+
+- Narodowy Korpus Języka Polskiego, praca zbiorowa pod redakcją Adama
+  Przepiórkowskiego, Mirosława Bańko, Rafała L. Górskiego, Barbary
+  Lewandowskiej-Tomaszczyk, Wydawnictwo Naukowe PWN, Warszawa 2012
+  http://nkjp.pl/settings/papers/NKJP_ksiazka.pdf
+
+"""
+
 from toygger import morphology as morph
 
 from toygger.morphology import Tagset, Category, optional
+
+# TODO Add lexems to cast POS to more generic categories, like in Polimorf tagset
 
 pos = Category('pos', ('adj', 'adja', 'adjc', 'adjp', 'adv', 'aglt', 'bedzie',
                        'brev', 'burk', 'comp', 'conj', 'depr', 'fin', 'ger',

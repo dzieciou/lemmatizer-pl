@@ -1,4 +1,4 @@
-'''
+"""
 Poliform tagset has been defined based on the work:
 
     Marcin Wolinski, Automatyczna analiza składnikowa języka polskiego,
@@ -9,7 +9,7 @@ and updated by comparing with actual tags in Poliform dictionary.
 
     http://download.sgjp.pl/morfeusz/20190818/polimorf-20190818.tab.gz
 
-'''
+"""
 
 from toygger import morphology as morph
 from toygger.morphology import Tagset, Category, optional
