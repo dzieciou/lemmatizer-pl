@@ -16,12 +16,8 @@ from lemmatizer.morphology import Tagset, Category, optional
 
 # TODO Add lexems to cast POS to more generic categories, like in Polimorf tagset
 
-pos = Category('pos', ('adj', 'adja', 'adjc', 'adjp', 'adv', 'aglt', 'bedzie',
-                       'brev', 'burk', 'comp', 'conj', 'depr', 'fin', 'ger',
-                       'ign', 'imps', 'impt', 'inf', 'interj', 'interp',
-                       'num', 'numcol', 'pact', 'pacta', 'pant', 'pcon',
-                       'ppas', 'ppron12', 'ppron3', 'praet', 'pred', 'prep',
-                       'qub', 'siebie', 'subst', 'winien', 'xxx'))
+
+
 number = Category('number', ('sg', 'pl', 'NONUM'))
 case = Category('case', ('nom', 'gen', 'dat', 'acc', 'inst', 'loc', 'voc',
                          'NOCASE'))
@@ -38,22 +34,6 @@ vocalicity = Category('vocalicity', ('wok', 'nwok', 'NOVOC'))
 negation = Category('negation', ('aff', 'neg', 'NOAFF'))
 fullstoppedness = Category('fullstoppedness', ('pun', 'npun', 'NOPUN'))
 
-categories = (
-    pos,
-    number,
-    case,
-    gender,
-    accommodability,
-    person,
-    accentability,
-    post_prepositionality,
-    degree,
-    aspect,
-    agglutination,
-    vocalicity,
-    negation,
-    fullstoppedness,
-)
 
 combinations = {
     'adj': (number, case, gender, degree),
@@ -95,6 +75,14 @@ combinations = {
     'winien': (number, gender, aspect),
     'xxx': (),
 }
+
+pos = Category('pos', tuple(combinations.keys()))
+
+categories = (
+    pos, number, case, gender, accommodability, person, accentability,
+    post_prepositionality, degree, aspect, agglutination, vocalicity, negation,
+    fullstoppedness
+)
 
 tagset = Tagset(categories, combinations)
 
