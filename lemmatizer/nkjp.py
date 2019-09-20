@@ -59,7 +59,6 @@ combinations = {
     'num': (number, case, gender, accommodability),
     'numcol': (number, case, gender, accommodability),
     'pact': (number, case, gender, aspect, negation),
-    'pacta': (),
     'pant': (aspect,),
     'pcon': (aspect,),
     'ppas': (number, case, gender, aspect, negation),

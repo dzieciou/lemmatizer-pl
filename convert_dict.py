@@ -13,6 +13,7 @@ following resources:
   Wydawnictwa Uniwersytetu Warszawskiego 2019
   https://doi.org/10.31338/uw.9788323536147
 - Morfeusz online demo: http://morfeusz.sgjp.pl/demo/
+- Morfeusz source code: http://download.sgjp.pl/morfeusz/
 - Narodowy Korpus Języka Polskiego, praca zbiorowa pod redakcją Adama
   Przepiórkowskiego, Mirosława Bańko, Rafała L. Górskiego, Barbary
   Lewandowskiej-Tomaszczyk, Wydawnictwo Naukowe PWN, Warszawa 2012
@@ -60,7 +61,10 @@ def polimorf2nkjp(ctag):
         #   m       [być:aglt:sg:pri:imperf:nwok]
         # Our morphological analyzer does not split words into smaller token
         # (i.e. so-called agglutination is not considered).
-        'cond': 'praet'
+        'cond': 'praet',
+        # In Polimorf it is used to describe composed forms like "ssąco" in
+        # "ssąco-tłocząca".
+        'pacta': 'adja'
     }.get(d['pos'], d['pos'])
 
     # Some categories are not present at all in NKJP tagset.
@@ -179,6 +183,6 @@ def convert_dict(in_fpath, out_fpath, convert):
 
 
 if __name__ == '__main__':
-    convert_dict('data/dict/polimorf-20190818.tab',
-                 'data/dict/polimorf2nkjp-20190818.tab',
+    convert_dict('data/dicts/polimorf-20190818.tab',
+                 'data/dicts/polimorf2nkjp-20190818.tab',
                  polimorf2nkjp)
