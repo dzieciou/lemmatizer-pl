@@ -167,7 +167,7 @@ class Dictionary:
         if token in self.lookup:
             return self.lookup[token]
 
-        return self.lookup.get(token.lower())
+        return self.lookup[token.lower()]
 
 def load_dict(fpath, tagset, limit=None, expand_tags=True, sep='\t',
     handle_preamble=None):

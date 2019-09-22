@@ -1,4 +1,6 @@
-from lemmatizer.morphology import Tagset, optional, Category
+import pytest
+
+from lemmatizer.morphology import Tagset, optional, Category, Dictionary
 
 
 def get_sample_tagset():
@@ -35,6 +37,18 @@ def test_parse_ctag():
 def test_cast_to_lexeme():
     tagset = get_sample_tagset()
     assert tagset.cast_to_lexeme('subst') == 'noun'
+
+def test_dictionary():
+
+    lookup = {'Camel': ['A'], 'camel': ['B'], 'case': ['C']}
+    tagset = get_sample_tagset()
+    dict = Dictionary(lookup, tagset)
+    assert dict['Camel'] == ['A']
+    assert dict['camel'] == ['B']
+    assert dict['Case'] == ['C']
+    with pytest.raises(KeyError):
+        assert dict['Dog']
+
 
 def test_Tagset():
     assert get_sample_tagset().valid_ctags == set({
