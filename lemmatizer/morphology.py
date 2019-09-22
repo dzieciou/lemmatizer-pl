@@ -73,6 +73,10 @@ class Tagset:
         self.check_ctag(ctag)
         return ctag
 
+    def cast_to_lexeme(self, pos_flexeme):
+        return self.lexem_by_pos[pos_flexeme]
+
+
 
 class DictEntry:
     """

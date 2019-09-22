@@ -8,6 +8,11 @@ def get_sample_tagset():
     yet_another_category = Category('yet_another_category',
                                     ('k', 'l', 'NOVAL4'))
 
+    lexemes = {
+        'adj': ('adj',),
+        'noun': ('subst',),
+    }
+
     combinations = {
         'adj': [number,
                 optional(another_category),
@@ -18,7 +23,7 @@ def get_sample_tagset():
     pos = Category('pos', combinations.keys())
     categories = (pos, number, gender, another_category, yet_another_category)
 
-    return Tagset(categories, combinations)
+    return Tagset(categories, combinations, lexemes)
 
 
 def test_parse_ctag():
@@ -27,6 +32,9 @@ def test_parse_ctag():
         'another_category': 'x'
     }
 
+def test_cast_to_lexeme():
+    tagset = get_sample_tagset()
+    assert tagset.cast_to_lexeme('subst') == 'noun'
 
 def test_Tagset():
     assert get_sample_tagset().valid_ctags == set({
