@@ -69,8 +69,8 @@ def check_chunks(chunks, tagset):
 
 def check(chunks_X, chunks_y, tagset):
 
-        check_chunks(chunks_X, tagset)
-        check_chunks(chunks_y, tagset)
+    check_chunks(chunks_X, tagset)
+    check_chunks(chunks_y, tagset)
 
     # TODO Move this to checks for PosTagger or MorphAnalyzer
     #      disambiguator is using only tagset, not dictionary
@@ -95,7 +95,8 @@ def load_train(analyzed, gold, tagset, word2vec, save_model):
 
     word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=10000)
 
-    check(chunks_X, chunks_y, tagset)
+    # TODO Uncomment, we want to spend money wisely on GPU training
+    # check(chunks_X, chunks_y, tagset)
 
     train(chunks_X, chunks_y, tagset, word2vec, save_model)
 
@@ -103,9 +104,9 @@ def load_train(analyzed, gold, tagset, word2vec, save_model):
 if __name__ == '__main__':
     configure_logs()
     load_train(
-        analyzed='c:/data/train/nkjp/poleval2017/train-analyzed.xml',
-        gold='c:/data/train/nkjp/poleval2017/train-gold.xml',
+        analyzed='data/train/nkjp/poleval2017/train-analyzed.xml.gz',
+        gold='data/train/nkjp/poleval2017/train-gold.xml.gz',
         tagset=nkjp.tagset,
-        word2vec='c:/data/nkjp+wiki-forms-all-300-skipg-ns.txt',
+        word2vec='data/nkjp+wiki-forms-all-300-skipg-ns.txt.gz',
         save_model='data/disambiguation2.h5'
     )
