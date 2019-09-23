@@ -1,3 +1,6 @@
+from tqdm import tqdm
+
+from lemmatizer.eval import timing
 from lemmatizer.morphology import Dictionary
 
 
@@ -15,12 +18,13 @@ class MorphAnalyzer:
         '''
         self.dict = dict
 
+    @timing
     def analyze(self, chunks):
         '''
         Updates a list of given chunks with morphological information
         :param chunks: text chunks to update
         '''
-        for chunk in chunks:
+        for chunk in tqdm(chunks, desc='Analyzing chunks'):
             for token in chunk.tokens:
                 try:
                     entries = self.dict[token.orth]

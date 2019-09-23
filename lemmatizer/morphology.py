@@ -2,6 +2,9 @@ from collections import namedtuple
 from itertools import product
 from typing import List
 
+from smart_open import open
+from tqdm import tqdm
+
 Category = namedtuple('Category', ['name', 'values'])
 
 
@@ -210,7 +213,7 @@ def load_dict(fpath, tagset, limit=None, expand_tags=True, sep='\t',
         else:
             lines = f
 
-        for line in lines:
+        for line in tqdm(lines, unit=' line', desc=f'Reading dictionary {fpath}'):
             entries = parse(line)
             orth = entries[0].orth
             if orth not in lookup:

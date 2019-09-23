@@ -1,7 +1,11 @@
-from lemmatizer.text import Chunk, Token
+import logging
+
 from lemmatizer.analyze import MorphAnalyzer
 from lemmatizer.disamb import MorphDisambiguator
+from lemmatizer.eval import timing
+from lemmatizer.text import Chunk, Token
 
+log = logging.getLogger(__name__)
 
 class Lemmatizer:
 
@@ -9,10 +13,10 @@ class Lemmatizer:
     def create(cls, dict, word2vec, model_fpath=None):
         analyzer = MorphAnalyzer(dict)
         disambiguator = MorphDisambiguator(dict.tagset, word2vec)
-        tagger = Lemmatizer(analyzer, disambiguator)
+        lemmatizer = Lemmatizer(analyzer, disambiguator)
         if not model_fpath is None:
-            tagger.load_model(model_fpath)
-        return tagger
+            lemmatizer.load_model(model_fpath)
+        return lemmatizer
 
     def __init__(self, analyzer, disambiguator):
         self._analyzer = analyzer
@@ -22,6 +26,8 @@ class Lemmatizer:
         tokens = [Token(orth) for orth in tokens]
         return Chunk(tokens)
 
+    # TODO Rename to lemmatize
+    @timing
     def tag(self, chunks):
         if isinstance(chunks, Chunk):
             chunks = [chunks]
@@ -43,8 +49,14 @@ class Lemmatizer:
         for chunk, pred_chunk in zip(chunks, pred_chunks):
             for token, pred_token in zip(chunk.tokens, pred_chunk.tokens):
                 disamb_ctag = pred_token.disamb_ctag
-                index = token.ctags.index(disamb_ctag)
-                disamb_lemma = token.lemmas[index]
+                candidate_ctags = token.ctags
+                if 'ign' in candidate_ctags:
+                    log.warning(f'No lemma can be found for {token.orth}. '
+                                f'Falling back to original form.')
+                    disamb_lemma = token.orth
+                else:
+                    index = candidate_ctags.index(disamb_ctag)
+                    disamb_lemma = token.lemmas[index]
                 pred_token.disamb_lemma = disamb_lemma
 
         return pred_chunks
