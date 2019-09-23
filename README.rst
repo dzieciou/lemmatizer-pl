@@ -33,6 +33,18 @@ Use in your code:
   ,
   kolego kolega rzeczownik
 
+Evaluation
+----------
+
+Time to load warm up (loading dictionary and wordnet)
+Time to predict for xxxx tokens: ???s (???s/token)
+Time to analyze and predict for xxxx tokens: ???s (???s/token)
+
+Disambiguation accuracy on token level:
+  Average: ?? %
+  For tokens with more than one ctag candidate: ?? %
+  For POS category only
+
 
 Design
 ------
@@ -76,19 +88,19 @@ model on samples annotated with the new tagset.
 
 .. _NKJP tagset: http://nkjp.pl/poliqarp/help/ense2.html
 
-Evaluation
-----------
-
-Time to load warm up (loading dictionary and wordnet)
-Time to predict for xxxx tokens: ???s (???s/token)
-Time to analyze and predict for xxxx tokens: ???s (???s/token)
-
-Disambiguation accuracy on token level:
-  Average: ?? %
-  For tokens with more than one ctag candidate: ?? %
-  For POS category only
 
 
+Setting up dev environment
+--------------------------
+
+.. code:: console
+
+  conda env create --file environment.yml
+  conda activate lemmatizer-env
+
+
+You may want to install custom build of tensorflow, e.g.: here are binaries for Windows:
+https://github.com/fo40225/tensorflow-windows-wheel/tree/master/1.13.1/py37/CPU/avx2
 
 How to train
 ------------
