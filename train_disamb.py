@@ -83,7 +83,7 @@ def train(chunks_X, chunks_y, tagset, word2vec, save_model):
     # TODO it should be possible to set epochs parameters during fitting, not constructing
     disambiguator = MorphDisambiguator(tagset, word2vec)
 
-    disambiguator.fit(chunks_X, chunks_y, epochs=6)
+    disambiguator.fit(chunks_X, chunks_y, epochs=1)
 
     disambiguator.save_model(save_model)
 
