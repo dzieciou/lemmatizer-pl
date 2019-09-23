@@ -138,9 +138,11 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
     predict = transform
 
+    @timing
     def save_model(self, fpath):
         self._get_model().model.save_weights(fpath)
 
+    @timing
     def load_model(self, fpath):
         self._check_setup()
         self._get_model().load_model_weights(fpath)
