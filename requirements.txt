@@ -1,9 +1,0 @@
-gensim
-keras
-tensorflow
-python-Levenshtein
-scikit-learn
-smart_open
-pytest
-pydot
-graphviz

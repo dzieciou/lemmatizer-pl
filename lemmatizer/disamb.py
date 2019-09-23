@@ -23,13 +23,14 @@ from tensorflow.python.keras.models import (
     Model
 )
 from tensorflow.python.keras.utils import plot_model
+from tqdm import tqdm
 
+from lemmatizer.eval import timing
 from lemmatizer.indexing import build_categories_index
 from lemmatizer.keras import KerasInputFormatter, KerasClassifierMultipleOutputs
 from lemmatizer.text import Chunk, Token
 
-log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log = logging.getLogger(__name__)
 
 HIDDEN_LAYERS = 2
 HIDDEN_LAYER_DIMENSION = 384
@@ -95,6 +96,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
         self._pipeline.set_params(**params)
 
+    @timing
     def fit(self, chunks_X, chunks_y, **fit_params):
         if len(chunks_X) != len(chunks_y):
             raise ValueError()
@@ -114,6 +116,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
                                    clf__epochs=1,
                                    clf__batch_size=128)
 
+    @timing
     def transform(self, chunks_X):
         '''
         Disambiguate ctags for given chunks of tokens.
@@ -225,9 +228,11 @@ class ChunkEncoder(BaseEstimator, TransformerMixin, ABC):
     (len(chunks), maxlen, token_vector_size)
     '''
 
+    @timing
     def transform(self, chunks):
         out_chunks = []
-        for chunk in chunks:
+        encoder_name = type(self).__name__
+        for chunk in tqdm(chunks, desc=f'Encoding chunks with {encoder_name}'):
             out_chunk = []
             for token in chunk.tokens:
                 vector = self._transform_token(token)
@@ -305,7 +310,7 @@ class WordEmbedEncoder(ChunkEncoder):
 
     def _group_words_by_suffix(self, vocab):
         words_by_suffix = defaultdict(set)
-        for word in vocab:
+        for word in tqdm(vocab, desc='Building word2vec suffix index'):
             for suffix_length in range(1, len(word)):
                 suffix = word[-suffix_length:]
                 words_by_suffix[suffix].add(word)
@@ -370,6 +375,7 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
     def __init__(self, outputs_names):
         self.outputs_names = outputs_names
 
+    @timing
     def transform(self, chunks):
         '''
         Transforms to all outputs
@@ -377,7 +383,8 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
         :return:
         '''
         outputs = defaultdict(list)
-        for chunk in chunks:
+        encoder_name = type(self).__name__
+        for chunk in tqdm(chunks, desc=f'Encoding chunks with {encoder_name}'):
             for output_id in self.outputs_names:
                 outputs[output_id].append([])
             for token in chunk.tokens:
@@ -397,12 +404,17 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
 
         return outputs
 
+    @timing
     def inverse_transform(self, outputs):
 
         # FIXME it would be better if outputs was a dictionary, but
         #       it looks it's not
+        encoder_name = type(self).__name__
         chunks = []
-        for chunk_output in zip(*outputs):
+        total = len(outputs[0])
+        for chunk_output in tqdm(zip(*outputs),
+                                 desc=f'Decoding chunks with {encoder_name}',
+                                 total=total):
             chunk = Chunk()
             chunks.append(chunk)
             for token_output in zip(*chunk_output):

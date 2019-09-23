@@ -4,6 +4,7 @@ from xml.sax.handler import feature_external_ges
 
 import xpath
 from smart_open import open
+from tqdm import tqdm
 
 from lemmatizer import Token, Chunk
 
@@ -12,7 +13,8 @@ def load_chunks(fpath, limit=None):
     with open(fpath, 'rb') as f:
         events = pulldom.parse(f, parser=_create_parser())
         chunk_id = 0
-        for chunk in _start_events(events, 'chunk'):
+        chunk_events = _start_events(events, 'chunk')
+        for chunk in tqdm(chunk_events, desc=f'Loading chunks from {fpath}'):
             for chunk in _findall(chunk, 'chunk'):
                 if chunk_id == limit:
                     return
@@ -38,7 +40,6 @@ def load_chunks(fpath, limit=None):
                     tokens.append(token)
 
                 yield Chunk(tokens)
-
 
 def load_chunks_set(analyzed_fpath, gold_fpath, limit=None):
     analyzed_chunks = load_chunks(analyzed_fpath, limit)

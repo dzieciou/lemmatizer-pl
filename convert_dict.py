@@ -26,6 +26,8 @@ following resources:
 from collections import defaultdict
 from itertools import groupby
 
+from tqdm import tqdm
+
 from lemmatizer import polimorf, nkjp
 from lemmatizer.morphology import DictEntry
 
@@ -145,14 +147,14 @@ def collapse(tagset, orth, entries):
 
 def collapse_all(tagset, lookup):
     merged = []
-    for orth, entries in lookup.items():
+    for orth, entries in tqdm(lookup.items(), desc='Merging entries'):
         merged.extend(collapse(tagset, orth, entries))
     return merged
 
 
 def convert_entries(lookup, convert):
     converted = defaultdict(list)
-    for orth, entries in lookup.items():
+    for orth, entries in tqdm(lookup.items(), desc='Converting entries'):
         for e in entries:
             try:
                 e.ctag = convert(e.ctag)
@@ -170,7 +172,7 @@ def convert_entries(lookup, convert):
 def write_dict(entries, fpath):
     # FIXME Note we do not add original preamble again
     with open(fpath, 'wb') as f:
-        for e in entries:
+        for e in tqdm(entries, desc='Writing entries'):
             line = f'{e.orth}\t{e.lemma}\t{e.ctag}\n'
             f.write(line.encode('utf-8'))
 
