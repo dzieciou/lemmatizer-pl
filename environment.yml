@@ -7,7 +7,7 @@ dependencies:
   - python>=3.7.4
   - gensim
   - keras
-  - tensorflow
+  - tensorflow-gpu
   - python-Levenshtein
   - scikit-learn
   - smart_open
