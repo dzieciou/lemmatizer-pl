@@ -116,6 +116,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
                 self._pipeline.fit(chunks_X, y,
                                    clf__epochs=1,
                                    clf__batch_size=128)
+            self.save_model('tmp_model.h5')
 
     @timing
     def transform(self, chunks_X):
@@ -142,6 +143,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
     @timing
     def save_model(self, fpath):
         self._get_model().model.save_weights(fpath)
+        self._get_model().model.save(fpath+'_whole.h5')
 
     @timing
     def load_model(self, fpath):
