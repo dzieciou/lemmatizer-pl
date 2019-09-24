@@ -1,6 +1,6 @@
 from gensim.models import KeyedVectors
 
-from eval import timing
+from lemmatizer.eval import timing
 from lemmatizer import nkjp
 from lemmatizer.disamb import MorphDisambiguator
 from xces import load_chunks_set

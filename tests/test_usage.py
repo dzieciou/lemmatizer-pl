@@ -3,7 +3,7 @@ import re
 
 from gensim.models import KeyedVectors
 
-from eval import timing
+from lemmatizer.eval import timing
 from lemmatizer import Lemmatizer
 from lemmatizer.polimorf import load_dict
 from lemmatizer.text import Chunk, Token
