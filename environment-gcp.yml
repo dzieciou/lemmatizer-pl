@@ -6,7 +6,7 @@ channels:
 dependencies:
   - gensim
   - keras
-  - tensorflow
+  - tensorflow-gpu=1.14
   - python-Levenshtein
   - scikit-learn
   - smart_open
