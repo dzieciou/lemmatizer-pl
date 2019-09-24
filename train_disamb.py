@@ -107,6 +107,6 @@ if __name__ == '__main__':
         analyzed='data/train/nkjp/poleval2017/train-analyzed.xml.gz',
         gold='data/train/nkjp/poleval2017/train-gold.xml.gz',
         tagset=nkjp.tagset,
-        word2vec='data/nkjp+wiki-forms-all-300-skipg-ns.txt',
+        word2vec='data/nkjp+wiki-forms-all-300-skipg-ns.txt.gz',
         save_model='data/disambiguation2.h5'
     )
