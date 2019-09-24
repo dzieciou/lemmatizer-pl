@@ -4,10 +4,10 @@ name: lemmatizer-env
 channels:
   - conda-forge
 dependencies:
-  - python=3.5.3
+  - python=3.5
   - gensim
   - keras
-  - tensorflow-gpu=1.14
+  - tensorflow-gpu
   - python-Levenshtein
   - scikit-learn
   - smart_open
