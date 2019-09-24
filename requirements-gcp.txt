@@ -1,0 +1,8 @@
+gensim
+python-Levenshtein
+smart_open
+pytest
+pydot
+graphviz
+tqdm
+py-dom-xpath-six
