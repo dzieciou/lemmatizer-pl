@@ -51,8 +51,8 @@ class Lemmatizer:
                 disamb_ctag = pred_token.disamb_ctag
                 candidate_ctags = token.ctags
                 if 'ign' in candidate_ctags:
-                    log.warning(f'No lemma can be found for {token.orth}. '
-                                f'Falling back to original form.')
+                    log.warning('No lemma can be found for {}. '
+                                'Falling back to original form.'.format(token.orth))
                     disamb_lemma = token.orth
                 else:
                     index = candidate_ctags.index(disamb_ctag)

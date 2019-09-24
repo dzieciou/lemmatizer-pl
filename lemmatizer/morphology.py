@@ -60,7 +60,7 @@ class Tagset:
 
     def check_ctag(self, ctag):
         if ctag not in self.valid_ctags:
-            raise ValueError(f'Invalid ctag: {ctag}')
+            raise ValueError('Invalid ctag: {}'.format(ctag))
 
     def get_category(self, value):
         if '.' in value:
@@ -99,7 +99,8 @@ class DictEntry:
         self.rest = rest
 
     def __str__(self):
-        return f'{{orth={self.orth}, lemma={self.lemma}, ctag={self.ctag}, rest={self.rest}}}'
+        return '{{orth={}, lemma={}, ctag={}, rest={}}}'\
+            .format(self.orth, self.lemma, self.ctag, self.rest)
 
     def __repr__(self):
         return self.__str__()
@@ -152,7 +153,7 @@ class Dictionary:
     def print_check(self):
         print("Invalid dictionary entries:")
         for orth, ctag in self.get_invalid_entries():
-            print(f'Invalid entry for {orth} with ctag {ctag}')
+            print('Invalid entry for {} with ctag {}'.format(orth, ctag))
 
         values_missing, values_unused = self.compare_tagset_with_dict()
         print("Values missing in tagset:", values_missing)
@@ -213,7 +214,7 @@ def load_dict(fpath, tagset, limit=None, expand_tags=True, sep='\t',
         else:
             lines = f
 
-        for line in tqdm(lines, unit=' line', desc=f'Reading dictionary {fpath}'):
+        for line in tqdm(lines, unit=' line', desc='Reading dictionary {}'.format(fpath)):
             entries = parse(line)
             orth = entries[0].orth
             if orth not in lookup:

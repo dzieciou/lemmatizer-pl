@@ -8,6 +8,7 @@ from operator import itemgetter
 
 import Levenshtein
 import numpy as np
+import keras
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
@@ -107,10 +108,10 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
         buckets = self._make_buckets(chunks_X, chunks_y)
         for epoch in range(self.epochs):
-            log.debug(f'Epoch {epoch + 1}/{self.epochs}...')
+            log.debug('Epoch {}/{}...'.format(epoch+1, self.epochs))
             random.shuffle(buckets)
             for bucket_id, (chunks_X, chunks_y) in enumerate(buckets):
-                log.debug(f'Bucket {bucket_id + 1}/{len(buckets)}...')
+                log.debug('Bucket {}/{}...'.format(bucket_id + 1, len(buckets)))
                 y = self._y_transformer.fit_transform(chunks_y)
                 self._pipeline.fit(chunks_X, y,
                                    clf__epochs=1,
@@ -234,7 +235,7 @@ class ChunkEncoder(BaseEstimator, TransformerMixin, ABC):
     def transform(self, chunks):
         out_chunks = []
         encoder_name = type(self).__name__
-        for chunk in tqdm(chunks, desc=f'Encoding chunks with {encoder_name}'):
+        for chunk in tqdm(chunks, desc='Encoding chunks with {}'.format(encoder_name)):
             out_chunk = []
             for token in chunk.tokens:
                 vector = self._transform_token(token)
@@ -386,7 +387,7 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
         '''
         outputs = defaultdict(list)
         encoder_name = type(self).__name__
-        for chunk in tqdm(chunks, desc=f'Encoding chunks with {encoder_name}'):
+        for chunk in tqdm(chunks, desc='Encoding chunks with {}'.format(encoder_name)):
             for output_id in self.outputs_names:
                 outputs[output_id].append([])
             for token in chunk.tokens:
@@ -415,7 +416,7 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
         chunks = []
         total = len(outputs[0])
         for chunk_output in tqdm(zip(*outputs),
-                                 desc=f'Decoding chunks with {encoder_name}',
+                                 desc='Decoding chunks with {}'.format(encoder_name),
                                  total=total):
             chunk = Chunk()
             chunks.append(chunk)
@@ -516,7 +517,7 @@ def create_model(categories, categories_index, word2vec):
         Dense(
             len(category.values),
             activation='softmax',
-            name=f'{category.name}')(biLSTM)
+            name='{}'.format(category.name))(biLSTM)
         for category
         in categories
     ]

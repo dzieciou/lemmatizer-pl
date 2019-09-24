@@ -61,7 +61,7 @@ def timing(orig_func):
         result = orig_func(*args, **kwargs)
         elapsed = time.time() - start
         caller = orig_func.__qualname__
-        log.debug(f'{caller} ran in: {elapsed:.2f} sec')
+        log.debug('{} ran in: {:.2f} sec'.format(caller, elapsed))
         return result
 
     return wrapper

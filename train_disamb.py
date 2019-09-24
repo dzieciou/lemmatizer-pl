@@ -55,7 +55,7 @@ def configure_logs():
 
 def check_ctag(ctag, tagset):
     if not ctag in tagset.valid_ctags:
-        raise ValueError(f'Invalid ctag: {ctag}')
+        raise ValueError('Invalid ctag: {}'.format(ctag))
 
 @timing
 def check_chunks(chunks, tagset):
@@ -107,6 +107,6 @@ if __name__ == '__main__':
         analyzed='data/train/nkjp/poleval2017/train-analyzed.xml.gz',
         gold='data/train/nkjp/poleval2017/train-gold.xml.gz',
         tagset=nkjp.tagset,
-        word2vec='data/nkjp+wiki-forms-all-300-skipg-ns.txt.gz',
+        word2vec='data/nkjp+wiki-forms-all-300-skipg-ns.txt',
         save_model='data/disambiguation2.h5'
     )

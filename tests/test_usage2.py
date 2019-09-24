@@ -29,6 +29,6 @@ def test_usage():
             tokens += 1
             correct_tokens += (pred_token.disamb_ctag == true_token.disamb_ctag)
 
-    print(f'{correct_tokens}/{tokens} = {correct_tokens/tokens} ')
+    print('{}/{} = {} '.format(correct_tokens, tokens, correct_tokens/tokens))
 
 test_usage()
