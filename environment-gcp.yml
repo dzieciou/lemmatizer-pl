@@ -4,6 +4,7 @@ name: lemmatizer-env
 channels:
   - conda-forge
 dependencies:
+  - python=3.5.3
   - gensim
   - keras
   - tensorflow-gpu=1.14
