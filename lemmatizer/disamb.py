@@ -39,10 +39,11 @@ HIDDEN_LAYER_DIMENSION = 384
 
 class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
-    def __init__(self, tagset, word2vec, bucket_size=2048, epochs=1,
-        correct_preds=True):
+    def __init__(self, tagset, word2vec, model_fpath=None, bucket_size=2048,
+        epochs=1, correct_preds=True):
         self.tagset = tagset
         self.word2vec = word2vec
+        self.model_fpath = model_fpath
         self.bucket_size = bucket_size
         self.epochs = epochs
         self._pipeline = None
@@ -55,17 +56,23 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
     def _setup(self):
         categories = self.tagset.categories
-        self._pipeline = self._create_pipeline(categories, self.word2vec)
+        self._pipeline = self._create_pipeline(categories, self.word2vec,
+                                               self.model_fpath)
         self._y_transformer = DisambCTagEncoder(categories)
         self._y_corrector = CTagCorrector(categories, self.tagset)
 
-    def _create_pipeline(self, categories, word2vec):
+    def _create_pipeline(self, categories, word2vec, model_fpath=None):
         categories_index = build_categories_index(categories)
-        biLSTM = KerasClassifierMultipleOutputs(
-            build_fn=create_model,
-            categories=categories,
-            categories_index=categories_index,
-            word2vec=word2vec)
+        if model_fpath is None:
+            biLSTM = KerasClassifierMultipleOutputs(
+                build_fn=create_model,
+                categories=categories,
+                categories_index=categories_index,
+                word2vec=word2vec)
+        else:
+            biLSTM = KerasClassifierMultipleOutputs(
+                build_fn=load_model,
+                fpath=model_fpath)
         pipeline = Pipeline([
             ('inputs', KerasInputFormatter([
                 ('word_vec', WordEmbedEncoder(word2vec)),
@@ -146,7 +153,7 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
         self._get_model().model.save(fpath+'_whole.h5')
 
     @timing
-    def load_model(self, fpath):
+    def load_model_weigths(self, fpath):
         self._check_setup()
         self._get_model().load_model_weights(fpath)
 
@@ -482,6 +489,9 @@ class DisambCTagEncoder(MultiOutputsChunkEncoder):
                 values.append(value)
         return ':'.join(values)
 
+def load_model(fpath):
+    from tensorflow.keras.models import load_model
+    return load_model(fpath)
 
 def create_model(categories, categories_index, word2vec):
     # First dimension of inputs is variable (None) because length of

@@ -79,17 +79,18 @@ def check(chunks_X, chunks_y, tagset):
 
 
 @timing
-def train(chunks_X, chunks_y, tagset, word2vec, save_model):
+def train(chunks_X, chunks_y, tagset, word2vec, load_model, save_model):
     # TODO it should be possible to set epochs parameters during fitting, not constructing
     disambiguator = MorphDisambiguator(tagset, word2vec)
 
-    disambiguator.fit(chunks_X, chunks_y, epochs=20)
+
+    disambiguator.fit(chunks_X, chunks_y, epochs=10)
 
     disambiguator.save_model(save_model)
 
 
 @timing
-def load_train(analyzed, gold, tagset, word2vec, save_model):
+def load_train(analyzed, gold, tagset, word2vec, load_model, save_model):
 
     chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=None)
 
@@ -98,7 +99,7 @@ def load_train(analyzed, gold, tagset, word2vec, save_model):
     # TODO Uncomment, we want to spend money wisely on GPU training
     # check(chunks_X, chunks_y, tagset)
 
-    train(chunks_X, chunks_y, tagset, word2vec, save_model)
+    train(chunks_X, chunks_y, tagset, word2vec, load_model, save_model)
 
 
 if __name__ == '__main__':
@@ -108,5 +109,6 @@ if __name__ == '__main__':
         gold='data/train/nkjp/poleval2017/train-gold.xml.gz',
         tagset=nkjp.tagset,
         word2vec='data/nkjp+wiki-forms-all-300-skipg-ns.txt.gz',
+        load_model='tmp_model.h5_whole.h5',
         save_model='data/disambiguation2.h5'
     )

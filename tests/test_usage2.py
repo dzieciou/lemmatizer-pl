@@ -19,7 +19,7 @@ def test_usage():
         word2vec = KeyedVectors.load_word2vec_format('c:/data/nkjp+wiki-forms-all-300-skipg-ns.txt')
 
     m = MorphDisambiguator(nkjp.tagset, word2vec, correct_preds=True)
-    m.load_model('data/disambiguation2.h5')
+    m.load_model_weigths('data/disambiguation2.h5')
 
     tokens = 0
     correct_tokens = 0

@@ -38,7 +38,7 @@ def test_usage():
 
     with timing('Initializing POS tagger'):
         posTagger = Lemmatizer.create(dict, word_vectors)
-        posTagger.load_model('data/disambiguation.h5')
+        posTagger.load_model_weigths('data/disambiguation.h5')
 
     text = '5 kilogramów pomidorów trafiło do kuchnii. Zostały ugotowane na miękko.'
     chunks = tokenize(text)

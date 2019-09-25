@@ -10,12 +10,15 @@ log = logging.getLogger(__name__)
 class Lemmatizer:
 
     @classmethod
-    def create(cls, dict, word2vec, model_fpath=None):
+    def create(cls, dict, word2vec, model_fpath=None, model_weights_fpath=None):
         analyzer = MorphAnalyzer(dict)
-        disambiguator = MorphDisambiguator(dict.tagset, word2vec)
+        disambiguator = MorphDisambiguator(dict.tagset, word2vec,
+                                           model_fpath=model_fpath)
         lemmatizer = Lemmatizer(analyzer, disambiguator)
-        if not model_fpath is None:
-            lemmatizer.load_model(model_fpath)
+        if not model_fpath is None and not model_weights_fpath is None:
+            return ValueError()
+        if not model_weights_fpath is None:
+            lemmatizer.load_model_weights(model_weights_fpath)
         return lemmatizer
 
     def __init__(self, analyzer, disambiguator):
@@ -61,5 +64,5 @@ class Lemmatizer:
 
         return pred_chunks
 
-    def load_model(self, fpath):
-        self._disambiguator.load_model(fpath)
+    def load_model_weights(self, fpath):
+        self._disambiguator.load_model_weigths(fpath)
