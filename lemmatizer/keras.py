@@ -48,6 +48,7 @@ class KerasClassifierMultipleOutputs(BaseWrapper):
         self._create_model()
         self.model.load_weights(fpath)
 
+    # TODO We don't actually log timing for fit, add it
     def fit(self, x, y, **fit_params):
         """
         Yes, successive calls to fit will incrementally train the model.

@@ -70,6 +70,13 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
                 categories_index=categories_index,
                 word2vec=word2vec)
         else:
+            # TODO This is temporary solution to resume training from the
+            #      the last saved checkpoint. I would rather try to see how
+            #      more experienced engineers/project do it, e.g.:
+            #      Object Detection API (search for resume, checkpoint, etc.)
+            #      https://github.com/tensorflow/models/tree/master/research/object_detection
+            #      + some related issues:
+            #      https://github.com/tensorflow/models/issues/4116
             biLSTM = KerasClassifierMultipleOutputs(
                 build_fn=load_model,
                 fpath=model_fpath)
@@ -114,6 +121,12 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
         self.set_params(**fit_params)
 
         buckets = self._make_buckets(chunks_X, chunks_y)
+        # TODO We currently don't have a way to easily see learning curve and
+        #      validation curve, or accuracy/loss curves for training.
+        #      normally keras.model.fit() returns history with possibility to
+        #      plot, but we're wrapping it and runing with single epoch.
+        #      TensorBoard also doesn't work for some reason.
+        #      I need this information to decide when to stop consuming the budget.
         for epoch in range(self.epochs):
             log.debug('Epoch {}/{}...'.format(epoch+1, self.epochs))
             random.shuffle(buckets)
@@ -307,6 +320,9 @@ class WordEmbedEncoder(ChunkEncoder):
         if word in self.word2vec:
             return self.word2vec[word]
         else:
+            # TODO This part is taking most time-consuming part of training.
+            #      One possible optimization would be to cache its results
+            #      or the results of the whole function
             for suffix_length in reversed(range(1, len(word))):
                 suffix = word[-suffix_length:]
                 if suffix in self.words_by_suffix:
@@ -494,12 +510,14 @@ class DisambCTagEncoder(MultiOutputsChunkEncoder):
                 values.append(value)
         return ':'.join(values)
 
-
+# FIXME Why timing here fails?
+#@timing
 def load_model(fpath):
     from tensorflow.keras.models import load_model
     return load_model(fpath)
 
-
+# FIXME Why timing here fails?
+#@timing
 def create_model(categories, categories_index, word2vec):
     # First dimension of inputs is variable (None) because length of
     # sentences can vary.
