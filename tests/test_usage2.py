@@ -1,6 +1,6 @@
 from gensim.models import KeyedVectors
 
-from eval import timing
+from lemmatizer.eval import timing
 from lemmatizer import nkjp
 from lemmatizer.disamb import MorphDisambiguator
 from xces import load_chunks_set
@@ -19,7 +19,7 @@ def test_usage():
         word2vec = KeyedVectors.load_word2vec_format('c:/data/nkjp+wiki-forms-all-300-skipg-ns.txt')
 
     m = MorphDisambiguator(nkjp.tagset, word2vec, correct_preds=True)
-    m.load_model('data/disambiguation2.h5')
+    m.load_model_weigths('data/disambiguation2.h5')
 
     tokens = 0
     correct_tokens = 0
@@ -29,6 +29,6 @@ def test_usage():
             tokens += 1
             correct_tokens += (pred_token.disamb_ctag == true_token.disamb_ctag)
 
-    print(f'{correct_tokens}/{tokens} = {correct_tokens/tokens} ')
+    print('{}/{} = {} '.format(correct_tokens, tokens, correct_tokens/tokens))
 
 test_usage()

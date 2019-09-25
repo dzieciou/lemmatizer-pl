@@ -162,7 +162,8 @@ def convert_entries(lookup, convert):
                 # skip writing whole entry
                 continue
             except ValueError as ex:
-                raise ValueError(f'Invalid ctag for {e.orth}', ex)
+                raise ValueError('Invalid ctag for {}'.format(e.orth),
+                                 ex)
             else:
                 converted[orth].append(e)
 
@@ -173,7 +174,7 @@ def write_dict(entries, fpath):
     # FIXME Note we do not add original preamble again
     with open(fpath, 'wb') as f:
         for e in tqdm(entries, desc='Writing entries'):
-            line = f'{e.orth}\t{e.lemma}\t{e.ctag}\n'
+            line = '{}\t{}\t{}\n'.format(e.orth, e.lemma, e.ctag)
             f.write(line.encode('utf-8'))
 
 

@@ -55,7 +55,7 @@ def configure_logs():
 
 def check_ctag(ctag, tagset):
     if not ctag in tagset.valid_ctags:
-        raise ValueError(f'Invalid ctag: {ctag}')
+        raise ValueError('Invalid ctag: {}'.format(ctag))
 
 @timing
 def check_chunks(chunks, tagset):
@@ -69,8 +69,8 @@ def check_chunks(chunks, tagset):
 
 def check(chunks_X, chunks_y, tagset):
 
-        check_chunks(chunks_X, tagset)
-        check_chunks(chunks_y, tagset)
+    check_chunks(chunks_X, tagset)
+    check_chunks(chunks_y, tagset)
 
     # TODO Move this to checks for PosTagger or MorphAnalyzer
     #      disambiguator is using only tagset, not dictionary
@@ -79,33 +79,34 @@ def check(chunks_X, chunks_y, tagset):
 
 
 @timing
-def train(chunks_X, chunks_y, tagset, word2vec, save_model):
+def train(chunks_X, chunks_y, tagset, word2vec, load_model, save_model):
     # TODO it should be possible to set epochs parameters during fitting, not constructing
-    disambiguator = MorphDisambiguator(tagset, word2vec)
-
-    disambiguator.fit(chunks_X, chunks_y, epochs=6)
+    disambiguator = MorphDisambiguator(tagset, word2vec, model_fpath=load_model)
+    disambiguator.fit(chunks_X, chunks_y, epochs=10)
 
     disambiguator.save_model(save_model)
 
 
 @timing
-def load_train(analyzed, gold, tagset, word2vec, save_model):
+def load_train(analyzed, gold, tagset, word2vec, load_model, save_model):
 
-    chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=4096)
+    chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=None)
 
-    word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=10000)
+    word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=None)
 
-    check(chunks_X, chunks_y, tagset)
+    # TODO Uncomment, we want to spend money wisely on GPU training
+    # check(chunks_X, chunks_y, tagset)
 
-    train(chunks_X, chunks_y, tagset, word2vec, save_model)
+    train(chunks_X, chunks_y, tagset, word2vec, load_model, save_model)
 
 
 if __name__ == '__main__':
     configure_logs()
     load_train(
-        analyzed='c:/data/train/nkjp/poleval2017/train-analyzed.xml',
-        gold='c:/data/train/nkjp/poleval2017/train-gold.xml',
+        analyzed='data/train/nkjp/poleval2017/train-analyzed.xml.gz',
+        gold='data/train/nkjp/poleval2017/train-gold.xml.gz',
         tagset=nkjp.tagset,
-        word2vec='c:/data/nkjp+wiki-forms-all-300-skipg-ns.txt',
+        word2vec='data/nkjp+wiki-forms-all-300-skipg-ns.txt.gz',
+        load_model='tmp_model.h5_whole.h5',
         save_model='data/disambiguation2.h5'
     )

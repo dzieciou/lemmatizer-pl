@@ -10,12 +10,15 @@ log = logging.getLogger(__name__)
 class Lemmatizer:
 
     @classmethod
-    def create(cls, dict, word2vec, model_fpath=None):
+    def create(cls, dict, word2vec, model_fpath=None, model_weights_fpath=None):
         analyzer = MorphAnalyzer(dict)
-        disambiguator = MorphDisambiguator(dict.tagset, word2vec)
+        disambiguator = MorphDisambiguator(dict.tagset, word2vec,
+                                           model_fpath=model_fpath)
         lemmatizer = Lemmatizer(analyzer, disambiguator)
-        if not model_fpath is None:
-            lemmatizer.load_model(model_fpath)
+        if not model_fpath is None and not model_weights_fpath is None:
+            return ValueError()
+        if not model_weights_fpath is None:
+            lemmatizer.load_model_weights(model_weights_fpath)
         return lemmatizer
 
     def __init__(self, analyzer, disambiguator):
@@ -51,8 +54,8 @@ class Lemmatizer:
                 disamb_ctag = pred_token.disamb_ctag
                 candidate_ctags = token.ctags
                 if 'ign' in candidate_ctags:
-                    log.warning(f'No lemma can be found for {token.orth}. '
-                                f'Falling back to original form.')
+                    log.warning('No lemma can be found for {}. '
+                                'Falling back to original form.'.format(token.orth))
                     disamb_lemma = token.orth
                 else:
                     index = candidate_ctags.index(disamb_ctag)
@@ -61,5 +64,5 @@ class Lemmatizer:
 
         return pred_chunks
 
-    def load_model(self, fpath):
-        self._disambiguator.load_model(fpath)
+    def load_model_weights(self, fpath):
+        self._disambiguator.load_model_weigths(fpath)

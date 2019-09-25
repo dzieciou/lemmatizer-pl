@@ -14,7 +14,8 @@ def load_chunks(fpath, limit=None):
         events = pulldom.parse(f, parser=_create_parser())
         chunk_id = 0
         chunk_events = _start_events(events, 'chunk')
-        for chunk in tqdm(chunk_events, desc=f'Loading chunks from {fpath}'):
+        desc = 'Loading chunks from {}'.format(fpath)
+        for chunk in tqdm(chunk_events, desc=desc):
             for chunk in _findall(chunk, 'chunk'):
                 if chunk_id == limit:
                     return

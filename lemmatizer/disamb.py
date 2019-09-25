@@ -8,6 +8,7 @@ from operator import itemgetter
 
 import Levenshtein
 import numpy as np
+import keras
 from keras_preprocessing.sequence import pad_sequences
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
@@ -38,10 +39,11 @@ HIDDEN_LAYER_DIMENSION = 384
 
 class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
-    def __init__(self, tagset, word2vec, bucket_size=2048, epochs=1,
-        correct_preds=True):
+    def __init__(self, tagset, word2vec, model_fpath=None, bucket_size=2048,
+        epochs=1, correct_preds=True):
         self.tagset = tagset
         self.word2vec = word2vec
+        self.model_fpath = model_fpath
         self.bucket_size = bucket_size
         self.epochs = epochs
         self._pipeline = None
@@ -54,17 +56,30 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
     def _setup(self):
         categories = self.tagset.categories
-        self._pipeline = self._create_pipeline(categories, self.word2vec)
+        self._pipeline = self._create_pipeline(categories, self.word2vec,
+                                               self.model_fpath)
         self._y_transformer = DisambCTagEncoder(categories)
         self._y_corrector = CTagCorrector(categories, self.tagset)
 
-    def _create_pipeline(self, categories, word2vec):
+    def _create_pipeline(self, categories, word2vec, model_fpath=None):
         categories_index = build_categories_index(categories)
-        biLSTM = KerasClassifierMultipleOutputs(
-            build_fn=create_model,
-            categories=categories,
-            categories_index=categories_index,
-            word2vec=word2vec)
+        if model_fpath is None:
+            biLSTM = KerasClassifierMultipleOutputs(
+                build_fn=create_model,
+                categories=categories,
+                categories_index=categories_index,
+                word2vec=word2vec)
+        else:
+            # TODO This is temporary solution to resume training from the
+            #      the last saved checkpoint. I would rather try to see how
+            #      more experienced engineers/project do it, e.g.:
+            #      Object Detection API (search for resume, checkpoint, etc.)
+            #      https://github.com/tensorflow/models/tree/master/research/object_detection
+            #      + some related issues:
+            #      https://github.com/tensorflow/models/issues/4116
+            biLSTM = KerasClassifierMultipleOutputs(
+                build_fn=load_model,
+                fpath=model_fpath)
         pipeline = Pipeline([
             ('inputs', KerasInputFormatter([
                 ('word_vec', WordEmbedEncoder(word2vec)),
@@ -106,23 +121,35 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
         self.set_params(**fit_params)
 
         buckets = self._make_buckets(chunks_X, chunks_y)
+        # TODO We currently don't have a way to easily see learning curve and
+        #      validation curve, or accuracy/loss curves for training.
+        #      normally keras.model.fit() returns history with possibility to
+        #      plot, but we're wrapping it and runing with single epoch.
+        #      TensorBoard also doesn't work for some reason.
+        #      I need this information to decide when to stop consuming the budget.
         for epoch in range(self.epochs):
-            log.debug(f'Epoch {epoch + 1}/{self.epochs}...')
+            log.debug('Epoch {}/{}...'.format(epoch+1, self.epochs))
             random.shuffle(buckets)
             for bucket_id, (chunks_X, chunks_y) in enumerate(buckets):
-                log.debug(f'Bucket {bucket_id + 1}/{len(buckets)}...')
+                log.debug('Bucket {}/{} of epoch {}/{}...'
+                          .format(bucket_id + 1,
+                                  len(buckets),
+                                  epoch+1,
+                                  self.epochs))
                 y = self._y_transformer.fit_transform(chunks_y)
                 self._pipeline.fit(chunks_X, y,
                                    clf__epochs=1,
                                    clf__batch_size=128)
+            self.save_model('tmp_model.h5')
 
-    @timing
+    #@timing
     def transform(self, chunks_X):
         '''
         Disambiguate ctags for given chunks of tokens.
         :param chunks_X:
         :return: list of list of predicted ctags for given chunks of tokens.
         '''
+        self._check_setup()
         y_pred = self._pipeline.predict(chunks_X)
         pred_chunks = self._y_transformer.inverse_transform(y_pred)
         if self.correct_preds:
@@ -138,10 +165,13 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
 
     predict = transform
 
+    @timing
     def save_model(self, fpath):
         self._get_model().model.save_weights(fpath)
+        self._get_model().model.save(fpath+'_whole.h5')
 
-    def load_model(self, fpath):
+    @timing
+    def load_model_weigths(self, fpath):
         self._check_setup()
         self._get_model().load_model_weights(fpath)
 
@@ -232,7 +262,7 @@ class ChunkEncoder(BaseEstimator, TransformerMixin, ABC):
     def transform(self, chunks):
         out_chunks = []
         encoder_name = type(self).__name__
-        for chunk in tqdm(chunks, desc=f'Encoding chunks with {encoder_name}'):
+        for chunk in tqdm(chunks, desc='Encoding chunks with {}'.format(encoder_name)):
             out_chunk = []
             for token in chunk.tokens:
                 vector = self._transform_token(token)
@@ -290,6 +320,9 @@ class WordEmbedEncoder(ChunkEncoder):
         if word in self.word2vec:
             return self.word2vec[word]
         else:
+            # TODO This part is taking most time-consuming part of training.
+            #      One possible optimization would be to cache its results
+            #      or the results of the whole function
             for suffix_length in reversed(range(1, len(word))):
                 suffix = word[-suffix_length:]
                 if suffix in self.words_by_suffix:
@@ -384,7 +417,7 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
         '''
         outputs = defaultdict(list)
         encoder_name = type(self).__name__
-        for chunk in tqdm(chunks, desc=f'Encoding chunks with {encoder_name}'):
+        for chunk in tqdm(chunks, desc='Encoding chunks with {}'.format(encoder_name)):
             for output_id in self.outputs_names:
                 outputs[output_id].append([])
             for token in chunk.tokens:
@@ -413,7 +446,7 @@ class MultiOutputsChunkEncoder(BaseEstimator, TransformerMixin, ABC):
         chunks = []
         total = len(outputs[0])
         for chunk_output in tqdm(zip(*outputs),
-                                 desc=f'Decoding chunks with {encoder_name}',
+                                 desc='Decoding chunks with {}'.format(encoder_name),
                                  total=total):
             chunk = Chunk()
             chunks.append(chunk)
@@ -477,7 +510,14 @@ class DisambCTagEncoder(MultiOutputsChunkEncoder):
                 values.append(value)
         return ':'.join(values)
 
+# FIXME Why timing here fails?
+#@timing
+def load_model(fpath):
+    from tensorflow.keras.models import load_model
+    return load_model(fpath)
 
+# FIXME Why timing here fails?
+#@timing
 def create_model(categories, categories_index, word2vec):
     # First dimension of inputs is variable (None) because length of
     # sentences can vary.
@@ -514,7 +554,7 @@ def create_model(categories, categories_index, word2vec):
         Dense(
             len(category.values),
             activation='softmax',
-            name=f'{category.name}')(biLSTM)
+            name='{}'.format(category.name))(biLSTM)
         for category
         in categories
     ]

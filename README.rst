@@ -93,17 +93,44 @@ model on samples annotated with the new tagset.
 Setting up dev environment
 --------------------------
 
+Install Anaconda
+
 .. code:: console
 
+  git clone
   conda env create --file environment.yml
   conda activate lemmatizer-env
-
+  cd lemmatizer-pl
+  wget http://dsmodels.nlp.ipipan.waw.pl/dsmodels/nkjp+wiki-forms-all-300-skipg-ns.txt.gz
+  mv http://dsmodels.nlp.ipipan.waw.pl/dsmodels/nkjp+wiki-forms-all-300-skipg-ns.txt.gz data
 
 You may want to install custom build of tensorflow, e.g.: here are binaries for Windows:
 https://github.com/fo40225/tensorflow-windows-wheel/tree/master/1.13.1/py37/CPU/avx2
 
+Setting up GCP with GPU environment
+------------------------------------
+
+.. code:: console
+
+  wget https://repo.anaconda.com/archive/Anaconda3-2019.07-Linux-x86_64.sh
+  chmod +x Anaconda3-2019.07-Linux-x86_64.sh
+  git clone
+  conda env create --file environment-gcp.yml
+  conda activate lemmatizer-env
+  wget http://dsmodels.nlp.ipipan.waw.pl/dsmodels/nkjp+wiki-forms-all-300-skipg-ns.txt.gz
+  mv http://dsmodels.nlp.ipipan.waw.pl/dsmodels/nkjp+wiki-forms-all-300-skipg-ns.txt.gz data
+  source ~/.bashrc
+
+md5sum Anaconda3-2019.07-Linux-x86_64.sh
+chmod +x Anaconda3-2019.07-Linux-x86_64.sh
+./Anaconda3-2019.07-Linux-x86_64.sh
+
+
+
 How to train
 ------------
+
+# TODO Instructions for training on GCP with GCU
 
 
 

@@ -1,0 +1,20 @@
+# run: conda env create --file environment.yml
+
+name: lemmatizer-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.5.3
+  - gensim
+  - keras=2.2.5
+  - tensorflow-gpu=1.14.0
+  - python-Levenshtein
+  - scikit-learn=0.20.4
+  - smart_open
+  - pytest
+  - pydot
+  - graphviz
+  - tqdm
+  - pip
+  - pip:
+    - py-dom-xpath-six

@@ -26,4 +26,5 @@ if __name__ == '__main__':
     tagged = tagger.tag(tokenized)
     for chunk in tagged:
         for token in chunk.tokens:
-            print(f'{token.orth}\t{token.disamb_lemma}\t{token.disamb_ctag}')
+            print('{}\t{}\t{}'
+                  .format(token.orth, token.disamb_lemma, token.disamb_ctag))
