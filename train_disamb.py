@@ -81,9 +81,7 @@ def check(chunks_X, chunks_y, tagset):
 @timing
 def train(chunks_X, chunks_y, tagset, word2vec, load_model, save_model):
     # TODO it should be possible to set epochs parameters during fitting, not constructing
-    disambiguator = MorphDisambiguator(tagset, word2vec)
-
-
+    disambiguator = MorphDisambiguator(tagset, word2vec, model_fpath=load_model)
     disambiguator.fit(chunks_X, chunks_y, epochs=10)
 
     disambiguator.save_model(save_model)
