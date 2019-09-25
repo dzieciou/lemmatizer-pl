@@ -70,6 +70,13 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
                 categories_index=categories_index,
                 word2vec=word2vec)
         else:
+            # TODO This is temporary solution to resume training from the
+            #      the last saved checkpoint. I would rather try to see how
+            #      more experienced engineers/project do it, e.g.:
+            #      Object Detection API (search for resume, checkpoint, etc.)
+            #      https://github.com/tensorflow/models/tree/master/research/object_detection
+            #      + some related issues:
+            #      https://github.com/tensorflow/models/issues/4116
             biLSTM = KerasClassifierMultipleOutputs(
                 build_fn=load_model,
                 fpath=model_fpath)
@@ -114,24 +121,35 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
         self.set_params(**fit_params)
 
         buckets = self._make_buckets(chunks_X, chunks_y)
+        # TODO We currently don't have a way to easily see learning curve and
+        #      validation curve, or accuracy/loss curves for training.
+        #      normally keras.model.fit() returns history with possibility to
+        #      plot, but we're wrapping it and runing with single epoch.
+        #      TensorBoard also doesn't work for some reason.
+        #      I need this information to decide when to stop consuming the budget.
         for epoch in range(self.epochs):
             log.debug('Epoch {}/{}...'.format(epoch+1, self.epochs))
             random.shuffle(buckets)
             for bucket_id, (chunks_X, chunks_y) in enumerate(buckets):
-                log.debug('Bucket {}/{}...'.format(bucket_id + 1, len(buckets)))
+                log.debug('Bucket {}/{} of epoch {}/{}...'
+                          .format(bucket_id + 1,
+                                  len(buckets),
+                                  epoch+1,
+                                  self.epochs))
                 y = self._y_transformer.fit_transform(chunks_y)
                 self._pipeline.fit(chunks_X, y,
                                    clf__epochs=1,
                                    clf__batch_size=128)
             self.save_model('tmp_model.h5')
 
-    @timing
+    #@timing
     def transform(self, chunks_X):
         '''
         Disambiguate ctags for given chunks of tokens.
         :param chunks_X:
         :return: list of list of predicted ctags for given chunks of tokens.
         '''
+        self._check_setup()
         y_pred = self._pipeline.predict(chunks_X)
         pred_chunks = self._y_transformer.inverse_transform(y_pred)
         if self.correct_preds:
@@ -302,6 +320,9 @@ class WordEmbedEncoder(ChunkEncoder):
         if word in self.word2vec:
             return self.word2vec[word]
         else:
+            # TODO This part is taking most time-consuming part of training.
+            #      One possible optimization would be to cache its results
+            #      or the results of the whole function
             for suffix_length in reversed(range(1, len(word))):
                 suffix = word[-suffix_length:]
                 if suffix in self.words_by_suffix:
@@ -489,12 +510,14 @@ class DisambCTagEncoder(MultiOutputsChunkEncoder):
                 values.append(value)
         return ':'.join(values)
 
-
+# FIXME Why timing here fails?
+#@timing
 def load_model(fpath):
     from tensorflow.keras.models import load_model
     return load_model(fpath)
 
-
+# FIXME Why timing here fails?
+#@timing
 def create_model(categories, categories_index, word2vec):
     # First dimension of inputs is variable (None) because length of
     # sentences can vary.
