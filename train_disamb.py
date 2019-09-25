@@ -92,9 +92,9 @@ def train(chunks_X, chunks_y, tagset, word2vec, load_model, save_model):
 @timing
 def load_train(analyzed, gold, tagset, word2vec, load_model, save_model):
 
-    chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=None)
+    chunks_X, chunks_y = load_chunks_set(analyzed, gold, limit=10)
 
-    word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=None)
+    word2vec = KeyedVectors.load_word2vec_format(word2vec, limit=10)
 
     # TODO Uncomment, we want to spend money wisely on GPU training
     # check(chunks_X, chunks_y, tagset)
