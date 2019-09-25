@@ -489,12 +489,12 @@ class DisambCTagEncoder(MultiOutputsChunkEncoder):
                 values.append(value)
         return ':'.join(values)
 
-@timing
+
 def load_model(fpath):
     from tensorflow.keras.models import load_model
     return load_model(fpath)
 
-@timing
+
 def create_model(categories, categories_index, word2vec):
     # First dimension of inputs is variable (None) because length of
     # sentences can vary.
