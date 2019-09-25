@@ -118,20 +118,25 @@ class MorphDisambiguator(BaseEstimator, TransformerMixin):
             log.debug('Epoch {}/{}...'.format(epoch+1, self.epochs))
             random.shuffle(buckets)
             for bucket_id, (chunks_X, chunks_y) in enumerate(buckets):
-                log.debug('Bucket {}/{}...'.format(bucket_id + 1, len(buckets)))
+                log.debug('Bucket {}/{} of epoch {}/{}...'
+                          .format(bucket_id + 1,
+                                  len(buckets),
+                                  epoch+1,
+                                  self.epochs))
                 y = self._y_transformer.fit_transform(chunks_y)
                 self._pipeline.fit(chunks_X, y,
                                    clf__epochs=1,
                                    clf__batch_size=128)
             self.save_model('tmp_model.h5')
 
-    @timing
+    #@timing
     def transform(self, chunks_X):
         '''
         Disambiguate ctags for given chunks of tokens.
         :param chunks_X:
         :return: list of list of predicted ctags for given chunks of tokens.
         '''
+        self._check_setup()
         y_pred = self._pipeline.predict(chunks_X)
         pred_chunks = self._y_transformer.inverse_transform(y_pred)
         if self.correct_preds:
